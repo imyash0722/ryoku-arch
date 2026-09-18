@@ -507,6 +507,14 @@ QtObject {
       }
     }
 
+    // Automatically purge associated desktop preset if one exists
+    var baseName = (name || "").replace(/\.[^/.]+$/, "");
+    var slug = baseName.replace(/[^\w\-\.]+/g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+    if (slug.length > 0) {
+      var presetDir = (Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")) + "/ryoku/user_edits/desktop_presets/" + slug;
+      Quickshell.execDetached(["rm", "-rf", presetDir]);
+    }
+
     DaemonClient.deleteItem(name, type, weId || "")
   }
 

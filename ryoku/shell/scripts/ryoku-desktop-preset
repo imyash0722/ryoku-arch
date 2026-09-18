@@ -1,0 +1,400 @@
+#!/usr/bin/env python3
+"""
+ryoku-desktop-preset: Manage per-wallpaper Quickshell desktop presets.
+Stores presets in ~/.config/ryoku/user_edits/desktop_presets/<slug>/
+"""
+
+import sys
+import os
+import json
+import re
+import shutil
+import argparse
+from pathlib import Path
+from datetime import datetime
+
+PRESET_FILES = ["widgets.json", "visualizer.json", "stage.json"]
+
+
+def get_base_dirs():
+    config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "ryoku"
+    state_dir = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+    presets_dir = config_dir / "user_edits" / "desktop_presets"
+    return config_dir, state_dir, presets_dir
+
+
+def get_current_wallpaper(state_dir: Path) -> str:
+    wall_file = state_dir / "ryoku-wallpaper"
+    if wall_file.is_file():
+        try:
+            val = wall_file.read_text(encoding="utf-8").strip()
+            if val:
+                return val
+        except Exception:
+            pass
+    return ""
+
+
+def slugify_wallpaper(wall_path: str) -> str:
+    if not wall_path:
+        return "default"
+    base = Path(wall_path).stem
+    # Clean characters, replace spaces and special symbols with dashes, collapse consecutive dashes
+    slug = re.sub(r"[^\w\-\.]+", "-", base)
+    slug = re.sub(r"-+", "-", slug).strip("-")
+    return slug or "wallpaper"
+
+
+def find_preset_dir(presets_dir: Path, wall_path: str, slug: str) -> Path | None:
+    if not presets_dir.is_dir():
+        return None
+
+    target_wall = str(Path(wall_path).resolve()) if wall_path else ""
+
+    # 1. Match by wallpaper path recorded in preset.json
+    if target_wall:
+        for p in presets_dir.iterdir():
+            if p.is_dir() and not p.name.startswith("."):
+                meta_file = p / "preset.json"
+                if meta_file.is_file():
+                    try:
+                        meta = json.loads(meta_file.read_text(encoding="utf-8"))
+                        saved_wall = meta.get("wallpaper", "")
+                        if saved_wall and str(Path(saved_wall).resolve()) == target_wall:
+                            return p
+                    except Exception:
+                        pass
+
+    # 2. Match by direct slug folder name
+    direct = presets_dir / slug
+    if direct.is_dir():
+        return direct
+
+    # 3. Match by normalized slug (collapsing dashes)
+    normalized_slug = re.sub(r"-+", "-", slug)
+    for p in presets_dir.iterdir():
+        if p.is_dir() and not p.name.startswith("."):
+            if re.sub(r"-+", "-", p.name) == normalized_slug:
+                return p
+
+    return None
+
+
+def atomic_copy(src: Path, dst: Path):
+    """Copy file safely using a temporary file to avoid partial reads by watchers."""
+    dst_dir = dst.parent
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    tmp_file = dst_dir / f".{dst.name}.tmp.{os.getpid()}"
+    try:
+        shutil.copyfile(src, tmp_file)
+        os.replace(tmp_file, dst)
+    except Exception as e:
+        if tmp_file.exists():
+            try:
+                tmp_file.unlink()
+            except Exception:
+                pass
+        raise e
+
+
+def cmd_current(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    wall = get_current_wallpaper(state_dir)
+    slug = slugify_wallpaper(wall)
+    pdir = find_preset_dir(presets_dir, wall, slug)
+    res = {
+        "wallpaper": wall,
+        "slug": slug,
+        "preset_dir": str(pdir) if pdir else None,
+        "has_preset": pdir is not None,
+    }
+    if getattr(args, "json", False):
+        print(json.dumps(res, indent=2))
+    else:
+        print(f"Active wallpaper: {wall or '<none>'}")
+        print(f"Slug:             {slug}")
+        print(f"Preset Directory: {pdir or '<none (unsaved)>'}")
+
+
+def cmd_save(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    wall = args.wallpaper or get_current_wallpaper(state_dir)
+    if not wall and not args.slug:
+        if not getattr(args, "quiet", False):
+            print("Error: No active wallpaper detected and none specified.", file=sys.stderr)
+        sys.exit(1)
+
+    slug = args.slug or slugify_wallpaper(wall)
+    pdir = find_preset_dir(presets_dir, wall, slug) or (presets_dir / slug)
+    pdir.mkdir(parents=True, exist_ok=True)
+
+    saved_files = []
+    for fname in PRESET_FILES:
+        src = config_dir / fname
+        if src.is_file():
+            dst = pdir / fname
+            atomic_copy(src, dst)
+            saved_files.append(fname)
+
+    now = datetime.now().astimezone().isoformat()
+    meta = {
+        "wallpaper": str(Path(wall).resolve()) if wall else "",
+        "slug": slug,
+        "name": Path(wall).stem if wall else slug,
+        "updated_at": now,
+        "files": saved_files,
+    }
+    meta_file = pdir / "preset.json"
+    meta_file.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+
+    if not getattr(args, "quiet", False):
+        print(f"Saved preset for '{slug}' ({len(saved_files)} files) to {pdir}")
+
+
+def cmd_load(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    wall = args.wallpaper or get_current_wallpaper(state_dir)
+    slug = args.slug or slugify_wallpaper(wall)
+
+    pdir = find_preset_dir(presets_dir, wall, slug)
+
+    if not pdir or not pdir.is_dir():
+        default_dir = presets_dir / "_default"
+        if default_dir.is_dir():
+            pdir = presets_dir / slug
+            pdir.mkdir(parents=True, exist_ok=True)
+            for fname in PRESET_FILES:
+                src = default_dir / fname
+                if src.is_file():
+                    atomic_copy(src, pdir / fname)
+            now = datetime.now().astimezone().isoformat()
+            meta = {
+                "wallpaper": str(Path(wall).resolve()) if wall else "",
+                "slug": slug,
+                "name": Path(wall).stem if wall else slug,
+                "updated_at": now,
+                "files": [f for f in PRESET_FILES if (pdir / f).is_file()],
+                "seeded_from": "_default",
+            }
+            (pdir / "preset.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+        else:
+            # First time seeing this wallpaper: save current state as its preset
+            save_args = argparse.Namespace(wallpaper=wall, slug=slug, quiet=True)
+            cmd_save(save_args)
+            pdir = presets_dir / slug
+
+    loaded_files = []
+    for fname in PRESET_FILES:
+        src = pdir / fname
+        if src.is_file():
+            dst = config_dir / fname
+            atomic_copy(src, dst)
+            loaded_files.append(fname)
+
+    if not getattr(args, "quiet", False):
+        print(f"Loaded preset '{slug}' ({len(loaded_files)} files) from {pdir}")
+
+
+def cmd_list(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    current_wall = get_current_wallpaper(state_dir)
+    current_slug = slugify_wallpaper(current_wall)
+    active_pdir = find_preset_dir(presets_dir, current_wall, current_slug)
+
+    items = []
+    if presets_dir.is_dir():
+        for p in sorted(presets_dir.iterdir()):
+            if p.is_dir() and not p.name.startswith("."):
+                meta_file = p / "preset.json"
+                wall = ""
+                updated = ""
+                if meta_file.is_file():
+                    try:
+                        m = json.loads(meta_file.read_text(encoding="utf-8"))
+                        wall = m.get("wallpaper", "")
+                        updated = m.get("updated_at", "")
+                    except Exception:
+                        pass
+                is_active = (active_pdir and p.resolve() == active_pdir.resolve()) or (p.name == current_slug)
+                items.append({
+                    "slug": p.name,
+                    "wallpaper": wall,
+                    "updated_at": updated,
+                    "active": is_active,
+                    "path": str(p),
+                })
+
+    if getattr(args, "json", False):
+        print(json.dumps(items, indent=2))
+        return
+
+    if not items:
+        print("No desktop presets saved yet in ~/.config/ryoku/user_edits/desktop_presets/")
+        return
+
+    print(f"{'ACTIVE':<8} {'PRESET SLUG':<35} {'UPDATED':<25} WALLPAPER")
+    print("-" * 100)
+    for it in items:
+        mark = "  *     " if it["active"] else "        "
+        up_str = it["updated_at"][:19].replace("T", " ") if it["updated_at"] else "<unknown>"
+        wall_name = Path(it["wallpaper"]).name if it["wallpaper"] else "<none>"
+        print(f"{mark}{it['slug']:<35} {up_str:<25} {wall_name}")
+
+
+def cmd_copy(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    src_slug = slugify_wallpaper(args.src) if ("/" in args.src or "\\" in args.src) else args.src
+    dst_slug = slugify_wallpaper(args.dst) if ("/" in args.dst or "\\" in args.dst) else args.dst
+
+    src_dir = presets_dir / src_slug
+    if not src_dir.is_dir():
+        print(f"Error: Source preset '{src_slug}' not found.", file=sys.stderr)
+        sys.exit(1)
+
+    dst_dir = presets_dir / dst_slug
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    for fname in PRESET_FILES:
+        sf = src_dir / fname
+        if sf.is_file():
+            atomic_copy(sf, dst_dir / fname)
+
+    now = datetime.now().astimezone().isoformat()
+    meta = {
+        "wallpaper": str(Path(args.dst).resolve()) if ("/" in args.dst) else "",
+        "slug": dst_slug,
+        "name": dst_slug,
+        "updated_at": now,
+        "copied_from": src_slug,
+        "files": [f for f in PRESET_FILES if (dst_dir / f).is_file()],
+    }
+    (dst_dir / "preset.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    print(f"Copied preset '{src_slug}' to '{dst_slug}'.")
+
+
+def cmd_delete(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    raw = args.slug
+    slug = slugify_wallpaper(raw) if ("/" in raw or "\\" in raw or "." in raw) else raw
+    pdir = find_preset_dir(presets_dir, "", slug) or (presets_dir / slug)
+    if not pdir or not pdir.is_dir():
+        if not getattr(args, "quiet", False):
+            print(f"Preset '{slug}' not found.", file=sys.stderr)
+        return
+
+    shutil.rmtree(pdir)
+    if not getattr(args, "quiet", False):
+        print(f"Deleted preset '{slug}'.")
+
+
+def cmd_prune(args):
+    config_dir, state_dir, presets_dir = get_base_dirs()
+    if not presets_dir.is_dir():
+        return
+
+    wallpapers_dir = Path.home() / "Pictures" / "Wallpapers"
+    videowalls_dir = Path.home() / "videowalls"
+
+    # Collect existing wallpaper filenames/stems for fast check
+    existing_files = set()
+    if wallpapers_dir.is_dir():
+        for f in wallpapers_dir.iterdir():
+            if f.is_file():
+                existing_files.add(str(f.resolve()))
+                existing_files.add(f.name)
+                existing_files.add(slugify_wallpaper(str(f)))
+    if videowalls_dir.is_dir():
+        for f in videowalls_dir.iterdir():
+            if f.is_file():
+                existing_files.add(str(f.resolve()))
+                existing_files.add(f.name)
+                existing_files.add(slugify_wallpaper(str(f)))
+
+    pruned = []
+    for p in presets_dir.iterdir():
+        if not p.is_dir() or p.name == "_default" or p.name.startswith("."):
+            continue
+
+        meta_file = p / "preset.json"
+        wall_path = ""
+        if meta_file.is_file():
+            try:
+                meta = json.loads(meta_file.read_text(encoding="utf-8"))
+                wall_path = meta.get("wallpaper", "")
+            except Exception:
+                pass
+
+        exists = False
+        if wall_path and (Path(wall_path).exists() or wall_path in existing_files):
+            exists = True
+        elif p.name in existing_files or re.sub(r"-+", "-", p.name) in existing_files:
+            exists = True
+
+        if not exists:
+            shutil.rmtree(p)
+            pruned.append(p.name)
+
+    if not getattr(args, "quiet", False):
+        if pruned:
+            print(f"Pruned {len(pruned)} orphaned preset(s): {', '.join(pruned)}")
+        else:
+            print("No orphaned presets found.")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="ryoku-desktop-preset",
+        description="Internal engine for per-wallpaper Quickshell desktop presets.",
+    )
+    subparsers = parser.add_subparsers(dest="command")
+
+    # current
+    p_curr = subparsers.add_parser("current", help="Show active wallpaper and preset")
+    p_curr.add_argument("--json", action="store_true", help="Output JSON")
+    p_curr.set_defaults(func=cmd_current)
+
+    # save
+    p_save = subparsers.add_parser("save", help="Save current desktop state to a wallpaper preset")
+    p_save.add_argument("wallpaper", nargs="?", default="", help="Wallpaper file path (default: active wallpaper)")
+    p_save.add_argument("--slug", default="", help="Explicit preset slug name")
+    p_save.add_argument("-q", "--quiet", action="store_true", help="Silent output")
+    p_save.set_defaults(func=cmd_save)
+
+    # load
+    p_load = subparsers.add_parser("load", help="Load preset for a wallpaper")
+    p_load.add_argument("wallpaper", nargs="?", default="", help="Wallpaper file path (default: active wallpaper)")
+    p_load.add_argument("--slug", default="", help="Explicit preset slug name")
+    p_load.add_argument("-q", "--quiet", action="store_true", help="Silent output")
+    p_load.set_defaults(func=cmd_load)
+
+    # list
+    p_list = subparsers.add_parser("list", help="List all saved presets")
+    p_list.add_argument("--json", action="store_true", help="Output JSON")
+    p_list.set_defaults(func=cmd_list)
+
+    # copy
+    p_copy = subparsers.add_parser("copy", help="Copy preset from one wallpaper/slug to another")
+    p_copy.add_argument("src", help="Source wallpaper path or slug")
+    p_copy.add_argument("dst", help="Destination wallpaper path or slug")
+    p_copy.set_defaults(func=cmd_copy)
+
+    # delete
+    p_del = subparsers.add_parser("delete", help="Delete a preset")
+    p_del.add_argument("slug", help="Wallpaper path or slug to delete")
+    p_del.add_argument("-q", "--quiet", action="store_true", help="Silent output")
+    p_del.set_defaults(func=cmd_delete)
+
+    # prune
+    p_prune = subparsers.add_parser("prune", help="Prune orphaned presets for deleted wallpapers")
+    p_prune.add_argument("-q", "--quiet", action="store_true", help="Silent output")
+    p_prune.set_defaults(func=cmd_prune)
+
+    args = parser.parse_args()
+    if not hasattr(args, "func"):
+        parser.print_help()
+        sys.exit(0)
+
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()

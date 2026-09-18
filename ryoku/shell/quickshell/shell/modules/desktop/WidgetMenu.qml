@@ -190,6 +190,19 @@ Item {
             closeOnTrigger: false
             onTriggered: menu.changeWallpaper()
         }
+        MenuRow {
+            visible: !menu.isWidget && DesktopPresets.currentSlug !== ""
+            label: I18n.tr("Preset: %1").arg(DesktopPresets.currentSlug)
+            value: I18n.tr("Save")
+            closeOnTrigger: false
+            onTriggered: DesktopPresets.saveCurrent()
+        }
+        MenuRow {
+            visible: !menu.isWidget && DesktopPresets.currentSlug !== ""
+            label: I18n.tr("Reload preset")
+            closeOnTrigger: true
+            onTriggered: DesktopPresets.loadCurrent()
+        }
 
         // ── widget scope ───────────────────────────────────────────────
         MenuRow {
