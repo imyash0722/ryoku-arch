@@ -62,6 +62,7 @@ hl.env("GSK_RENDERER", "gl")
 -- so switching here would strip plain Qt apps of their palette, Papirus icons
 -- and font. A user who installs plasma-integration can set kde here themselves.
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
+hl.env("QT_PLUGIN_PATH", os.getenv("HOME") .. "/.local/lib/qt6/plugins:" .. (os.getenv("QT_PLUGIN_PATH") or "/usr/lib/qt6/plugins"))
 
 -- Shared QML modules (Ryoku.Ui, Ryoku.PluginKit, Ryoku.Blobs) live in
 -- /usr/lib/qt6/qml on an installed system, which Qt finds on its own. A

@@ -59,8 +59,8 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    name   = "float-nautilus",
-    match  = { class = "org.gnome.Nautilus" },
+    name   = "float-filemanager",
+    match  = { class = "(org.gnome.Nautilus|org.kde.dolphin)" },
     float  = true,
     size   = fit(1500, 850),
     center = true,

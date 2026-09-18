@@ -39,7 +39,7 @@ fallback() {
 		else echo "chromium"; fi ;;
 	terminal) echo "kitty" ;;
 	editor)   echo "kitty -e nvim" ;;
-	files)    echo "nautilus" ;;
+	files)    echo "dolphin" ;;
 	*)        echo "" ;;
 	esac
 }

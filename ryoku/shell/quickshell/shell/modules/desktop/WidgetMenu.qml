@@ -190,17 +190,18 @@ Item {
             closeOnTrigger: false
             onTriggered: menu.changeWallpaper()
         }
+        MenuSection { visible: !menu.isWidget }
         MenuRow {
-            visible: !menu.isWidget && DesktopPresets.currentSlug !== ""
-            label: I18n.tr("Preset: %1").arg(DesktopPresets.currentSlug)
+            visible: !menu.isWidget
+            label: I18n.tr("Preset: %1").arg(DesktopPresets.currentSlug || "Default")
             value: I18n.tr("Save")
             closeOnTrigger: false
             onTriggered: DesktopPresets.saveCurrent()
         }
         MenuRow {
-            visible: !menu.isWidget && DesktopPresets.currentSlug !== ""
+            visible: !menu.isWidget
             label: I18n.tr("Reload preset")
-            closeOnTrigger: true
+            closeOnTrigger: false
             onTriggered: DesktopPresets.loadCurrent()
         }
 
