@@ -116,7 +116,7 @@ Singleton {
         else audioGrace.restart();
     }
     Timer { id: audioGrace; interval: 4000; onTriggered: root.audioIdle = true }
-    readonly property bool visualizerFrozen: lowPower || saver || gaming || audioIdle
+    readonly property bool visualizerFrozen: lowPower || gaming || audioIdle
     readonly property bool pillFrozen:       lowPower || saver || gaming || audioIdle
 
     // Ambient motion: the bar's stream drifting on a passive sine while the desktop
