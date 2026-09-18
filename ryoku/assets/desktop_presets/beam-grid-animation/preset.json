@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/beam-grid-animation.mp4",
+  "slug": "beam-grid-animation",
+  "name": "beam-grid-animation",
+  "updated_at": "2026-09-19T01:32:20.067815+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

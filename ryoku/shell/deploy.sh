@@ -146,6 +146,7 @@ say "installed $bindir/ryoku-shell"
 install -m755 "$here/scripts/ryoku-reload-cover" "$bindir/ryoku-reload-cover"
 install -m755 "$here/scripts/ryostage" "$bindir/ryostage"
 install -m755 "$here/scripts/ryoku-eq" "$bindir/ryoku-eq"
+install -m755 "$here/scripts/ryoku-desktop-preset" "$bindir/ryoku-desktop-preset"
 # Depth and Parallax merged into ryostage; a checkout box that installed the old
 # helpers keeps them on PATH forever otherwise (pacman drops them on packaged boxes).
 rm -f "$bindir"/ryoku-{depth,parallax-engine}
@@ -195,6 +196,18 @@ if [[ ! -f "$cfg/ryogami-wall/config.json" ]]; then
   printf '{}\n' > "$cfg/ryogami-wall/config.json"
 fi
 [[ -e "$cfg/ryogami-wall/.bootstrapped" ]] || : > "$cfg/ryogami-wall/.bootstrapped"
+
+# Seed default wallpapers and desktop presets if absent
+if [[ -d "$here/../assets/wallpapers" && ! -d "$HOME/Pictures/Wallpapers" ]]; then
+  mkdir -p "$HOME/Pictures/Wallpapers"
+  cp -rn "$here/../assets/wallpapers/." "$HOME/Pictures/Wallpapers/" 2>/dev/null || true
+  say "seeded default wallpapers -> $HOME/Pictures/Wallpapers"
+fi
+if [[ -d "$here/../assets/desktop_presets" && ! -d "$cfg/ryoku/user_edits/desktop_presets" ]]; then
+  mkdir -p "$cfg/ryoku/user_edits/desktop_presets"
+  cp -rn "$here/../assets/desktop_presets/." "$cfg/ryoku/user_edits/desktop_presets/" 2>/dev/null || true
+  say "seeded desktop presets -> $cfg/ryoku/user_edits/desktop_presets"
+fi
 
 # Build the Ryoku Hub backend (a separate Go binary; the hub's quickshell config
 # shells out to it for the keybind legend and its TOML config).

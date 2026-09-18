@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/wallhaven-1qkrww.png",
+  "slug": "wallhaven-1qkrww",
+  "name": "wallhaven-1qkrww",
+  "updated_at": "2026-09-19T01:39:20.013308+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

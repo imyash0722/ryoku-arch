@@ -296,6 +296,7 @@ ryoku_deploy_seed() {
   # the decor art the Decor/Placard components render, beside Wallpapers and
   # livewalls so a user can see and swap it. `ryoku doctor` keeps it current.
   deploy_dir "$RYOKU_REPO/ryoku/assets/ryodecors" "$h/Pictures/ryodecors"
+  deploy_dir "$RYOKU_REPO/ryoku/assets/desktop_presets" "$h/.config/ryoku/user_edits/desktop_presets"
   deploy_file "$RYOKU_REPO/ryoku/apps/npm/npmrc" "$h/.npmrc"
 }
 

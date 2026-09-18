@@ -1217,6 +1217,7 @@ EOF`); err != nil {
 	}{
 		{"ryoku/assets/brand", ".local/share/ryoku/assets/brand", true, false},
 		{"ryoku/assets/wallpapers", "Pictures/Wallpapers", true, true},
+		{"ryoku/assets/desktop_presets", ".config/ryoku/user_edits/desktop_presets", true, true},
 		{"ryoku/apps/npm/npmrc", ".npmrc", false, true},
 		{"ryoku/apps/nvim/ryoku-nvim.desktop", ".local/share/applications/ryoku-nvim.desktop", false, false},
 		// no mimeapps.list seed: the default-app map belongs to the vendor layer

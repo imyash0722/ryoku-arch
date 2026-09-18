@@ -46,4 +46,6 @@ package() {
     "$pkgdir/usr/bin/ryoku-desktop-preset"
   install -d "$pkgdir/usr/share/ryoku/reload-cover"
   cp -a "$_repo/ryoku/shell/quickshell/reload-cover/." "$pkgdir/usr/share/ryoku/reload-cover/"
+  install -d "$pkgdir/usr/share/ryoku/desktop_presets"
+  cp -a "$_repo/ryoku/assets/desktop_presets/." "$pkgdir/usr/share/ryoku/desktop_presets/"
 }

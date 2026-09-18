@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/ocean-torii-gate.png",
+  "slug": "ocean-torii-gate",
+  "name": "ocean-torii-gate",
+  "updated_at": "2026-09-19T01:50:00.768405+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

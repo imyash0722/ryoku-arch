@@ -45,6 +45,9 @@ def slugify_wallpaper(wall_path: str) -> str:
     return slug or "wallpaper"
 
 
+SYSTEM_PRESETS_DIR = Path("/usr/share/ryoku/desktop_presets")
+
+
 def find_preset_dir(presets_dir: Path, wall_path: str, slug: str) -> Path | None:
     if not presets_dir.is_dir():
         return None
@@ -60,8 +63,10 @@ def find_preset_dir(presets_dir: Path, wall_path: str, slug: str) -> Path | None
                     try:
                         meta = json.loads(meta_file.read_text(encoding="utf-8"))
                         saved_wall = meta.get("wallpaper", "")
-                        if saved_wall and str(Path(saved_wall).resolve()) == target_wall:
-                            return p
+                        if saved_wall:
+                            expanded = str(Path(os.path.expanduser(saved_wall)).resolve())
+                            if expanded == target_wall:
+                                return p
                     except Exception:
                         pass
 
@@ -137,8 +142,13 @@ def cmd_save(args):
             saved_files.append(fname)
 
     now = datetime.now().astimezone().isoformat()
+    wall_portable = str(Path(wall).resolve()) if wall else ""
+    home_str = str(Path.home().resolve())
+    if wall_portable.startswith(home_str):
+        wall_portable = "~" + wall_portable[len(home_str):]
+
     meta = {
-        "wallpaper": str(Path(wall).resolve()) if wall else "",
+        "wallpaper": wall_portable,
         "slug": slug,
         "name": Path(wall).stem if wall else slug,
         "updated_at": now,
@@ -159,29 +169,48 @@ def cmd_load(args):
     pdir = find_preset_dir(presets_dir, wall, slug)
 
     if not pdir or not pdir.is_dir():
-        default_dir = presets_dir / "_default"
-        if default_dir.is_dir():
+        # Check system default presets (/usr/share/ryoku/desktop_presets)
+        sys_pdir = find_preset_dir(SYSTEM_PRESETS_DIR, wall, slug) if SYSTEM_PRESETS_DIR.is_dir() else None
+        if sys_pdir and sys_pdir.is_dir():
             pdir = presets_dir / slug
             pdir.mkdir(parents=True, exist_ok=True)
             for fname in PRESET_FILES:
-                src = default_dir / fname
+                src = sys_pdir / fname
                 if src.is_file():
                     atomic_copy(src, pdir / fname)
-            now = datetime.now().astimezone().isoformat()
-            meta = {
-                "wallpaper": str(Path(wall).resolve()) if wall else "",
-                "slug": slug,
-                "name": Path(wall).stem if wall else slug,
-                "updated_at": now,
-                "files": [f for f in PRESET_FILES if (pdir / f).is_file()],
-                "seeded_from": "_default",
-            }
-            (pdir / "preset.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+            src_meta = sys_pdir / "preset.json"
+            if src_meta.is_file():
+                atomic_copy(src_meta, pdir / "preset.json")
         else:
-            # First time seeing this wallpaper: save current state as its preset
-            save_args = argparse.Namespace(wallpaper=wall, slug=slug, quiet=True)
-            cmd_save(save_args)
-            pdir = presets_dir / slug
+            default_dir = presets_dir / "_default"
+            if not default_dir.is_dir() and SYSTEM_PRESETS_DIR.is_dir():
+                default_dir = SYSTEM_PRESETS_DIR / "_default"
+            if default_dir.is_dir():
+                pdir = presets_dir / slug
+                pdir.mkdir(parents=True, exist_ok=True)
+                for fname in PRESET_FILES:
+                    src = default_dir / fname
+                    if src.is_file():
+                        atomic_copy(src, pdir / fname)
+                now = datetime.now().astimezone().isoformat()
+                wall_portable = str(Path(wall).resolve()) if wall else ""
+                home_str = str(Path.home().resolve())
+                if wall_portable.startswith(home_str):
+                    wall_portable = "~" + wall_portable[len(home_str):]
+                meta = {
+                    "wallpaper": wall_portable,
+                    "slug": slug,
+                    "name": Path(wall).stem if wall else slug,
+                    "updated_at": now,
+                    "files": [f for f in PRESET_FILES if (pdir / f).is_file()],
+                    "seeded_from": "_default",
+                }
+                (pdir / "preset.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+            else:
+                # First time seeing this wallpaper: save current state as its preset
+                save_args = argparse.Namespace(wallpaper=wall, slug=slug, quiet=True)
+                cmd_save(save_args)
+                pdir = presets_dir / slug
 
     loaded_files = []
     for fname in PRESET_FILES:

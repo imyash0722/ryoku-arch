@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/cyber-tunnel-loop.mp4",
+  "slug": "cyber-tunnel-loop",
+  "name": "cyber-tunnel-loop",
+  "updated_at": "2026-09-19T01:49:31.122687+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

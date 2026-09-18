@@ -1,0 +1,19 @@
+{
+    "edge": 0.15,
+    "front": [
+    ],
+    "motion": {
+        "amount": "normal",
+        "backdrop": 0,
+        "idle": "float",
+        "mouse": true,
+        "music": true,
+        "musicLevel": 0.6,
+        "range": 1,
+        "sensitivity": 1,
+        "speed": 0.6
+    },
+    "quality": "fine",
+    "shadow": 0,
+    "shadowAngle": 90
+}

@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/wallhaven-x1232v.png",
+  "slug": "wallhaven-x1232v",
+  "name": "wallhaven-x1232v",
+  "updated_at": "2026-09-19T01:36:10.465196+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

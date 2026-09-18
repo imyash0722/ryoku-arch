@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/departing-train-loop.mp4",
+  "slug": "departing-train-loop",
+  "name": "departing-train-loop",
+  "updated_at": "2026-09-19T01:34:03.940085+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

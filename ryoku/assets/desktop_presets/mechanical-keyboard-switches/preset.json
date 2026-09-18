@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/mechanical-keyboard-switches.jpg",
+  "slug": "mechanical-keyboard-switches",
+  "name": "mechanical-keyboard-switches",
+  "updated_at": "2026-09-19T01:29:05.549436+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}

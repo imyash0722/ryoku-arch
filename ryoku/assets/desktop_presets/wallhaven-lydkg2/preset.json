@@ -1,0 +1,11 @@
+{
+  "wallpaper": "~/Pictures/Wallpapers/wallhaven-lydkg2.jpg",
+  "slug": "wallhaven-lydkg2",
+  "name": "wallhaven-lydkg2",
+  "updated_at": "2026-09-19T01:21:17.481801+05:30",
+  "files": [
+    "widgets.json",
+    "visualizer.json",
+    "stage.json"
+  ]
+}
