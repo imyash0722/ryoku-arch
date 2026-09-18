@@ -193,7 +193,7 @@ Singleton {
     // Fallback pins so an empty dock is not mistaken for a missing one.
     function starterPins() {
         const out = [];
-        for (const className of ["kitty", "chromium", "nautilus"])
+        for (const className of ["kitty", "chromium", "org.kde.dolphin", "nautilus"])
             if (DesktopEntries.heuristicLookup(className)) out.push(className);
         return out;
     }

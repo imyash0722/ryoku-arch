@@ -188,7 +188,7 @@ Singleton {
         var u = host.user && host.user.length > 0 ? host.user + "@" : "";
         var h = host.hostName && host.hostName.length > 0 ? host.hostName : host.alias;
         var p = host.port && host.port !== 22 ? ":" + host.port : "";
-        Quickshell.execDetached(["nautilus", "sftp://" + u + h + p + "/"]);
+        Quickshell.execDetached(["dolphin", "sftp://" + u + h + p + "/"]);
     }
     // open a host's web app in the default browser.
     function openApp(url) { if (url && url.length > 0) Quickshell.execDetached(["xdg-open", url]); }
