@@ -26,7 +26,20 @@ Singleton {
                 }
             }
         }
-        // Follow the "main" monitor as set in Displays settings (global origin 0,0)
+        // Follow the "main" monitor as set in Displays settings (monitors-applied.json or global origin 0,0)
+        try {
+            if (appliedMonitorsFile.text()) {
+                const applied = JSON.parse(appliedMonitorsFile.text());
+                if (applied && applied.monitors) {
+                    for (let j = 0; j < applied.monitors.length; ++j) {
+                        const am = applied.monitors[j];
+                        if (am && (am.position === "0x0" || am.position === "0,0") && am.output) {
+                            return am.output;
+                        }
+                    }
+                }
+            }
+        } catch (e) {}
         if (typeof Hyprland !== "undefined" && Hyprland.monitors && Hyprland.monitors.values) {
             const mons = Hyprland.monitors.values;
             for (let i = 0; i < mons.length; ++i) {
@@ -329,6 +342,15 @@ Singleton {
             property bool markTint: true
             property string name: "Ryoku"
         }
+    }
+
+    FileView {
+        id: appliedMonitorsFile
+        path: (Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")) + "/ryoku/monitors-applied.json"
+        blockLoading: true
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
     }
 
     Component.onCompleted: if (!file.text()) file.writeAdapter();
