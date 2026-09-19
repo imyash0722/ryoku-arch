@@ -204,6 +204,12 @@ depends=(
   'libqalculate'         # calculator backend (launcher Super+Space)
   'upower'               # battery + power status (pill/bar battery indicator)
   'power-profiles-daemon'
+  'tlp'                  # advanced power management daemon
+  'powertop'             # power consumption diagnostics and reporting
+  'corectrl'             # GPU and CPU hardware tuning
+  'blueman'              # Bluetooth graphical manager (Connections page)
+  'network-manager-applet' # NetworkManager GUI connection editor
+  'kimageformats'        # image formats plugin for viewers and file managers
   # external-monitor brightness over DDC/CI: the pill DISPLAY faders and the
   # XF86MonBrightness keys drive external displays through `ddcutil setvcp`.
   # was base.packages-only, so it never reached update/shell boxes (the pill
@@ -223,6 +229,8 @@ optdepends=(
   # The applications Ryoku ships. Optional here on purpose: the ISO pacstraps
   # them and `ryoku doctor` delivers them once to an existing box, so pacman
   # never has a missing dependency to "repair" and a deleted app stays deleted.
+  'dolphin: the default graphical file manager'
+  'qimgv: the default Qt6 image viewer'
   'kitty: the default terminal'
   'fish: optional interactive shell'
   'blesh: Bash line editor'
@@ -230,9 +238,10 @@ optdepends=(
   'fastfetch: system summary (launcher, RyoStore covers)'
   'yazi: terminal file manager'
   'neovim: the shipped editor'
-  'nautilus: graphical file manager'
+  'nautilus: alternative graphical file manager'
   'nautilus-python: Ryoku stash actions in the Nautilus right-click menu'
   'ryotunes: the Ryoku music app the now-playing widget follows'
+
   'ryomotion: screen-demo recorder and editor'
   'waifu2x-ncnn-vulkan: AI upscale for ryoshot Beautify HD and ryowalls Enhance'
   'pavucontrol: GUI mixer behind the bar Open audio button'
@@ -394,8 +403,9 @@ EOF
   install -Dm644 "$_repo/ryoku/apps/terminal-shell/env.sh"  "$cfg/ryoku-terminal/env.sh"
   install -Dm644 "$_repo/ryoku/apps/bash/ryoku.bash"        "$cfg/bash/ryoku.bash"
   install -Dm644 "$_repo/ryoku/apps/bash/rashin.bash"       "$cfg/bash/rashin.bash"
-  install -Dm644 "$_repo/ryoku/apps/zsh/ryoku.zsh"          "$cfg/zsh/ryoku.zsh"
-  install -Dm644 "$_repo/ryoku/apps/zsh/rashin.zsh"         "$cfg/zsh/rashin.zsh"
+  install -d "$cfg/zsh"
+  cp -a "$_repo/ryoku/apps/zsh/." "$cfg/zsh/"
+
   # GTK toolkit baseline for the xsettings-less Wayland session (see the header
   # of each file); materialized and pruned by `ryoku materialize` like qt6ct.conf.
   install -Dm644 "$_repo/ryoku/shell/gtk-3.0/settings.ini" "$cfg/gtk-3.0/settings.ini"
@@ -708,6 +718,17 @@ EOF
   # so the grant stays safe.
   install -Dm644 "$_repo/system/hardware/power/53-ryoku-game-tune.rules" \
     "$pkgdir/usr/share/polkit-1/rules.d/53-ryoku-game-tune.rules"
+
+  # CoreCtrl polkit rule: authorize hardware controls for active wheel user
+  install -Dm644 "$_repo/system/hardware/power/90-corectrl.rules" \
+    "$pkgdir/usr/share/polkit-1/rules.d/90-corectrl.rules"
+
+  # PowerTOP and TLP diagnostics report helper and sudoers grant
+  install -Dm755 "$_repo/system/hardware/power/ryoku-power-report" \
+    "$pkgdir/usr/bin/ryoku-power-report"
+  install -Dm440 "$_repo/system/hardware/power/powertop.sudoers" \
+    "$pkgdir/etc/sudoers.d/powertop"
+
 
   # Windows dual-boot: cross-drive detector + a limine-entry-tool post.d hook
   # that re-asserts the uuid()-addressed chainload entry whenever the boot menu

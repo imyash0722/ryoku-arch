@@ -58,3 +58,7 @@ ttf-fraunces-variable
 # still gets the Ryoku Zen policy (shipped extensions + Wayland/hardware-decode
 # and privacy defaults) applied by `ryoku doctor`. See reconcile_zen.go.
 zen-browser-bin
+
+# Image viewer: qimgv Qt6 image viewer
+qimgv
+

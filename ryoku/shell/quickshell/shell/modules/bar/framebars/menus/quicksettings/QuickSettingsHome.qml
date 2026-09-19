@@ -17,6 +17,14 @@ Item {
     property var navigate: null
     property var closePanel: null
 
+    // Opaque surface backing so the incoming push covers the outgoing module cleanly;
+    // without it the incoming home tab lets the outgoing tab's text ghost underneath.
+    Rectangle {
+        anchors.fill: parent
+        color: Theme.surface
+    }
+
+
     function awakeFor() {
         const since = Flags.keepAwakeSince;
         if (!since || since <= 0)

@@ -1,0 +1,2 @@
+# Allow wheel group members to run powertop and tlp-stat without password for diagnostics
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/powertop, /usr/bin/tlp-stat

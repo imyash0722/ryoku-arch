@@ -72,7 +72,7 @@ var bootChainSkip = map[string]bool{
 // daemon, from the [ryoku] repo) and matugen (the palette generator, from the
 // official repo) are hard ryoku-desktop depends the packages step already
 // pulled; no AUR build is needed.
-var aurPkgs = []string{"bibata-cursor-theme-bin", "localsend-bin", "voxtype-bin"}
+var aurPkgs = []string{"bibata-cursor-theme-bin", "localsend-bin", "voxtype-bin", "qimgv"}
 
 // system/packages/dev.packages; ryoku recovery builds from source and needs go.
 var devPkgs = []string{"go", "nodejs", "npm", "python", "python-pip", "python-pipx", "mise"}

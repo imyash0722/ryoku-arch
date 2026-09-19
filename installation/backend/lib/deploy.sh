@@ -298,7 +298,10 @@ ryoku_deploy_seed() {
   deploy_dir "$RYOKU_REPO/ryoku/assets/ryodecors" "$h/Pictures/ryodecors"
   deploy_dir "$RYOKU_REPO/ryoku/assets/desktop_presets" "$h/.config/ryoku/user_edits/desktop_presets"
   deploy_file "$RYOKU_REPO/ryoku/apps/npm/npmrc" "$h/.npmrc"
+  deploy_file "$RYOKU_REPO/ryoku/apps/zsh/zshrc" "$h/.zshrc"
+  deploy_dir "$RYOKU_REPO/ryoku/apps/zsh" "$h/.config/zsh"
 }
+
 
 # qylock: install the lockscreen bundle + the SDDM clockwork theme. not yet
 # packaged, so the bundle ships in the payload and its two installers run

@@ -22,7 +22,14 @@ Item {
     property var navigate: null
     property var closePanel: null
 
+    // Opaque surface backing so the push covers the outgoing module cleanly
+    Rectangle {
+        anchors.fill: parent
+        color: Theme.surface
+    }
+
     readonly property var sb: St.StageBackend
+
     readonly property var cfg: St.Config
     readonly property string effect: root.sb.effect
     readonly property string wall: root.sb.current

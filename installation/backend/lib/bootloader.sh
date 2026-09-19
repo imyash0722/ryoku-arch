@@ -37,9 +37,11 @@ ryoku_bootloader() {
     ryoku_bootloader_own_esp
   fi
 
-  log "enabling services: sddm, NetworkManager, bluetooth, rtkit, power-profiles-daemon"
-  run arch-chroot /mnt systemctl enable sddm.service NetworkManager.service bluetooth.service rtkit-daemon.service power-profiles-daemon.service
+  log "enabling services: sddm, NetworkManager, bluetooth, rtkit, tlp"
+  run arch-chroot /mnt systemctl enable sddm.service NetworkManager.service bluetooth.service rtkit-daemon.service tlp.service
+  run arch-chroot /mnt systemctl mask power-profiles-daemon.service 2>/dev/null || true
 }
+
 
 ryoku_bootloader_own_esp() {
   if chroot_has limine-mkinitcpio; then

@@ -196,10 +196,12 @@ Item {
             root.showPage("");
             root.switchToModule(root.initialPage);
             break;
+        case "home":
         case "calendar":
             root.showPage("");
             root.switchToModule("home");
             break;
+
         default:
             root.showPage(root.initialPage);
         }
@@ -333,6 +335,16 @@ Item {
                                 || root.previousModule === moduleLoaderDelegate.moduleId)
                         NumberAnimation { duration: Motion.push; easing.type: Motion.pushCurve }
                     }
+
+                    opacity: root.activeModule === moduleId ? 1.0 : 0.0
+
+                    Behavior on opacity {
+                        enabled: root.open && root.navReady
+                            && (root.activeModule === moduleLoaderDelegate.moduleId
+                                || root.previousModule === moduleLoaderDelegate.moduleId)
+                        NumberAnimation { duration: Motion.push; easing.type: Motion.pushCurve }
+                    }
+
 
                     onStatusChanged: root.completePendingModule(moduleId, moduleLoaderDelegate)
                     Binding {

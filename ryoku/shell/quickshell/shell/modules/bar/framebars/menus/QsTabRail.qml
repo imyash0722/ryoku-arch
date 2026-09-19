@@ -20,7 +20,7 @@ Item {
 
     readonly property int notifCount: Notifs.history.length
 
-    implicitWidth: 44
+    implicitWidth: 50
 
     // Right-edge hairline only - no fill rect, no seam
     Rectangle {
@@ -33,10 +33,11 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 6
+        spacing: 8
 
         Repeater {
             model: root.modules
+
 
             delegate: RailTab {
                 required property string modelData
@@ -92,7 +93,7 @@ Item {
         property int badge: 0
         signal activated()
 
-        width: 36; height: 36
+        width: 40; height: 40
 
         // Hover wash underneath disc so the hover shows even when disc is hidden
         Rectangle {
@@ -127,8 +128,9 @@ Item {
 
         // Icon: onPrimary on active disc, onSurfaceVariant otherwise.
         MaterialIcon {
-            anchors.centerIn: parent; font.pixelSize: 20
+            anchors.centerIn: parent; font.pixelSize: 22
             text: rt.icon
+
             fill: rt.active ? 1 : 0
             color: rt.active
                 ? Theme.inkOn(Theme.primary, Theme.onPrimary)
@@ -172,7 +174,7 @@ Item {
         property string tipText: ""
         signal clicked()
 
-        width: 34; height: 34
+        width: 36; height: 36
 
         Rectangle {
             anchors.fill: parent; radius: width / 2
@@ -182,9 +184,10 @@ Item {
             Behavior on color { ColorAnimation { duration: Motion.fast } }
         }
         MaterialIcon {
-            anchors.centerIn: parent; font.pixelSize: 17; text: rib.icon
+            anchors.centerIn: parent; font.pixelSize: 18; text: rib.icon
             color: Theme.inkOn(Theme.effectiveSurface, Theme.onSurfaceVariant, 3.0)
         }
+
         scale: ribTap.pressed ? 0.88 : 1.0
         Behavior on scale { NumberAnimation { duration: Motion.fast; easing.type: Easing.OutBack; easing.overshoot: 2.0 } }
         MouseArea {

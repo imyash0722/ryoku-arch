@@ -89,8 +89,11 @@ if command -v eza >/dev/null 2>&1; then
 fi
 
 _ryoku_cfg=${XDG_CONFIG_HOME:-$HOME/.config}
+[[ -r $_ryoku_cfg/zsh/functions.zsh ]] && source "$_ryoku_cfg/zsh/functions.zsh"
+[[ -r $_ryoku_cfg/zsh/aliases.zsh ]] && source "$_ryoku_cfg/zsh/aliases.zsh"
 [[ -r $_ryoku_cfg/zsh/rashin.zsh ]] && source "$_ryoku_cfg/zsh/rashin.zsh"
 [[ -r $_ryoku_cfg/zsh/user.zsh ]] && source "$_ryoku_cfg/zsh/user.zsh"
 
 unset _ryoku_prompt _ryoku_omz
 unset _ryoku_cfg
+
