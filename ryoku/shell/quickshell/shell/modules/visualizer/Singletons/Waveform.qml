@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "."
 
 // live playback waveform for the line style's oscilloscope. wavecap.py captures
 // the default sink's monitor (PipeWire-native, since the Pulse path can't
@@ -13,7 +14,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property bool active: false
+    property bool active: Config.enabled && Config.anyLine
     // per-frame waveform samples (-1..1); empty == no signal (draw flat).
     property var samples: []
     property real lastReadMs: 0

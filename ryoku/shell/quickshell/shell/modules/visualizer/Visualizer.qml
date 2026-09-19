@@ -38,38 +38,7 @@ Item {
     onPlaceableChanged: Spectrum.placementHolds += root.placeable ? 1 : -1
     Component.onDestruction: if (root.placeable) Spectrum.placementHolds -= 1
 
-    // cava runs whenever the visualiser is enabled: gating on "audio playing"
-    // needs a probe that is either broken or costs a periodic graph dump, while
-    // cava is ~1% idle and the render already freezes on silence.
-    Binding {
-        target: Spectrum
-        property: "active"
-        value: root.active || root.suppressed
-    }
 
-    // one shared cava for every instance, at the largest band count any of them
-    // wants; each Motion resamples down. changing it restarts cava.
-    Binding {
-        target: Spectrum
-        property: "bars"
-        value: Config.maxBars
-    }
-
-    // cava's framerate follows the render ceiling: no point sampling faster than
-    // the spectrum draws.
-    Binding {
-        target: Spectrum
-        property: "fps"
-        value: Config.fps
-    }
-
-    // the scope look draws the actual playback waveform; capture the monitor only
-    // while some instance is the line look and the visualiser is on.
-    Binding {
-        target: Waveform
-        property: "active"
-        value: root.active && Config.anyLine
-    }
 
     PanelWindow {
         id: win

@@ -14,7 +14,7 @@
 #   [General] Experimental=true        battery levels + newer profiles; the shell
 #                                      Bluetooth panel reads device battery from
 #                                      the experimental interface
-#   [General] FastConnectable=true     quick reconnect after sleep/idle
+#   [General] FastConnectable=false    false avoids packet drops / handle errors on MT7921/MT7922
 #   [General] JustWorksRepairing=always re-pair survives keys dropped over suspend
 #   [General] MultiProfile=multiple    combo peripherals bring up every profile
 #   [Policy]  AutoEnable=true          Bluetooth powers on by default
@@ -32,7 +32,7 @@ conf="${RYOKU_BT_MAIN_CONF:-/etc/bluetooth/main.conf}"
 [[ -f $conf ]] || { echo "ryoku-bluetooth-tune: $conf absent (bluez not installed); nothing to do"; exit 0; }
 
 # The desired keys, "Section:Key:Value", space separated.
-specs="General:Experimental:true General:FastConnectable:true General:JustWorksRepairing:always General:MultiProfile:multiple Policy:AutoEnable:true"
+specs="General:Experimental:true General:FastConnectable:false General:JustWorksRepairing:always General:MultiProfile:multiple Policy:AutoEnable:true"
 
 # awk rewrites the file: in a target section it replaces the key line (commented
 # or set) with the wanted value; a target key never seen in its section is added

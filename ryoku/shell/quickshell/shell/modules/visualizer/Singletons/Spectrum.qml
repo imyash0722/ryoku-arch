@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import shell.services
+import "."
 
 // high-resolution playback spectrum for the desktop visualiser. mirrors the
 // pill's AudioBars but reads the PipeWire playback monitor at 64 bands / 60fps
@@ -18,9 +19,9 @@ import shell.services
 Singleton {
     id: root
 
-    property bool active: false
-    property int bars: 64
-    property int fps: 30
+    property bool active: Config.enabled
+    property int bars: Config.maxBars
+    property int fps: Config.fps
     // Instances being placed (Super+Alt+M) hold this up so the spectrum keeps
     // running while it is aimed: you cannot position a frozen, invisible line.
     property int placementHolds: 0
