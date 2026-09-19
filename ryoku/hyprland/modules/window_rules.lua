@@ -46,6 +46,30 @@ hl.window_rule({
     float = true,
 })
 
+-- Firefox Picture-in-Picture: float, pin across workspaces, small bottom-right placement
+hl.window_rule({
+    name  = "firefox-pip",
+    match = {
+        class = "^[Ff]irefox$",
+        title = "^[Pp]icture-in-[Pp]icture$",
+    },
+    float = true,
+    pin   = true,
+    size  = { 640, 360 },
+    move  = "monitor_w-660 monitor_h-380",
+})
+
+-- Firefox dialogs and sub-windows: float and center
+hl.window_rule({
+    name   = "firefox-dialogs",
+    match  = {
+        class = "^[Ff]irefox$",
+        title = "^(Library|About .*Firefox.*|Opening .*|Extension: .*|Firefox — Sharing Indicator|Page Info.*|Edit Bookmark.*|Add Bookmark.*|Bookmark This Page.*|Clear Recent History.*|Clear All History.*|Firefox - Choose User Profile|Enter name of file to save to…|Save Image.*|Developer Tools — .*)$",
+    },
+    float  = true,
+    center = true,
+})
+
 hl.window_rule({
     name  = "float-ghosttype",
     match = { class = "Ghosttype-app" },
