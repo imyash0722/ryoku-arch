@@ -850,8 +850,41 @@ done
                         leftPadding: Tokens.s4; rightPadding: Tokens.s4
                         topPadding: Tokens.s1; bottomPadding: Tokens.s3
                         wrapMode: Text.WordWrap
-                        text: I18n.tr("Want deeper overclocking (voltage curves, fan curves)? Install LACT, a dedicated GPU control daemon.")
+                        text: I18n.tr("Want deeper overclocking (voltage curves, fan curves)? Install LACT or use CoreCtrl below.")
                         color: Tokens.inkFaint; font.family: Tokens.ui; font.pixelSize: Tokens.fTiny
+                    }
+                }
+
+                // ── HARDWARE TUNING & POWER ──
+                SettingCard {
+                    width: gfxCol.width
+                    title: I18n.tr("HARDWARE TUNING & POWER")
+
+                    SettingRow {
+                        anchors.left: parent.left; anchors.right: parent.right
+                        label: I18n.tr("CoreCtrl (iGPU & Hardware Tuning)")
+                        desc: I18n.tr("Launch CoreCtrl for real-time AMD Radeon iGPU voltage, frequency profiles, and sensor graphs.")
+                        controlWidth: 150
+                        Btn {
+                            anchors.verticalCenter: parent.verticalCenter
+                            compact: true
+                            text: I18n.tr("Launch CoreCtrl")
+                            onAct: Spawn.run(["corectrl"])
+                        }
+                    }
+
+                    SettingRow {
+                        anchors.left: parent.left; anchors.right: parent.right
+                        divider: true
+                        label: I18n.tr("TLP Power Management")
+                        desc: I18n.tr("Universal Linux power manager active for optimal battery savings and performance.")
+                        controlWidth: 150
+                        Btn {
+                            anchors.verticalCenter: parent.verticalCenter
+                            compact: true
+                            text: I18n.tr("TLP Status")
+                            onAct: Spawn.run(["kitty", "--class", "floating-terminal", "-e", "sh", "-c", "sudo tlp-stat -s; echo; read -n1 -rsp 'Press any key to close…'"])
+                        }
                     }
                 }
 

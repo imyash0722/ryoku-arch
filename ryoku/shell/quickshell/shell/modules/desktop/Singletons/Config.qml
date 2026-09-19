@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import shell.services as Services
 
 // Live config for the wallpaper clock. Ryoku Settings, desktop dragging and the
@@ -17,23 +18,27 @@ Singleton {
 
     readonly property string effectivePrimaryMonitor: {
         const screens = Services.ShellState.screens;
-        if (!screens || screens.length === 0) {
-            return Quickshell.screens.length > 0 && Quickshell.screens[0] ? Quickshell.screens[0].name : "";
-        }
         if (root.primaryMonitor && root.primaryMonitor.length > 0) {
-            for (let i = 0; i < screens.length; ++i) {
-                if (screens[i] && screens[i].name === root.primaryMonitor)
-                    return root.primaryMonitor;
+            if (screens) {
+                for (let i = 0; i < screens.length; ++i) {
+                    if (screens[i] && screens[i].name === root.primaryMonitor)
+                        return root.primaryMonitor;
+                }
             }
         }
-        const active = Services.ShellState.forActive();
-        if (active && active.modelData && active.modelData.name) {
-            for (let i = 0; i < screens.length; ++i) {
-                if (screens[i] && screens[i].name === active.modelData.name)
-                    return active.modelData.name;
+        // Follow the "main" monitor as set in Displays settings (global origin 0,0)
+        if (typeof Hyprland !== "undefined" && Hyprland.monitors && Hyprland.monitors.values) {
+            const mons = Hyprland.monitors.values;
+            for (let i = 0; i < mons.length; ++i) {
+                if (mons[i] && mons[i].x === 0 && mons[i].y === 0) {
+                    return mons[i].name;
+                }
             }
         }
-        return screens[0] ? screens[0].name : "";
+        if (screens && screens.length > 0 && screens[0]) {
+            return screens[0].name;
+        }
+        return Quickshell.screens.length > 0 && Quickshell.screens[0] ? Quickshell.screens[0].name : "";
     }
 
     // -- clock ---------------------------------------------------------------

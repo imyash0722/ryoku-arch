@@ -298,6 +298,11 @@ Item {
             height: parent.height
             clip: true
 
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.surface
+            }
+
 
             Repeater {
                 id: moduleRepeater
@@ -371,7 +376,6 @@ Item {
         // own back-nav header, so covering the whole band is correct.
         Rectangle {
             anchors.fill: parent
-            radius: Config.frameCorner
             color: Theme.surface
         }
 

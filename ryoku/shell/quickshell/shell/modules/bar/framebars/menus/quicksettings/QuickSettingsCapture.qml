@@ -19,7 +19,6 @@ Item {
     // Opaque backing so the incoming push covers the outgoing module cleanly.
     Rectangle {
         anchors.fill: parent
-        radius: Config.frameCorner
         color: Theme.surface
     }
 

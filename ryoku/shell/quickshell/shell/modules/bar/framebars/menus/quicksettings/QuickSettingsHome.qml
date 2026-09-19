@@ -312,10 +312,6 @@ Item {
                 }
             }
 
-            Menus.MediaHero {
-                width: parent.width
-                active: root.open
-            }
 
             Menus.QsSection {
                 visible: PowerProfiles.available

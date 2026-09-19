@@ -52,6 +52,16 @@ Singleton {
         return a;
     }
 
+    Connections {
+        target: Audio
+        function onSinkChanged() {
+            if (cavaProc.running) {
+                cavaProc.backoff = true;
+                restartTimer.restart();
+            }
+        }
+    }
+
     Process {
         id: cavaProc
         // playback spectrum via cava's native pipewire backend, source=auto (the default sink's monitor). the pulse backend can't connect here ("Connection terminated") even with pipewire-pulse up, and this path needs no pactl. exec so quickshell's SIGTERM reaches cava, leaving no orphaned analyser when the surface unloads.

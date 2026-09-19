@@ -29,7 +29,7 @@ hl.window_rule({
 
 hl.window_rule({
     name  = "float-system-dialogs",
-    match = { class = "(pavucontrol|nm-connection-editor|blueman-manager|org.kde.polkit-kde-authentication-agent-1|xdg-desktop-portal-gtk)" },
+    match = { class = "(pavucontrol|nm-connection-editor|blueman-manager|corectrl|org.corectrl.CoreCtrl|org.kde.polkit-kde-authentication-agent-1|xdg-desktop-portal-gtk)" },
     float = true,
 })
 

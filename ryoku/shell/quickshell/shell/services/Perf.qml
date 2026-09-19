@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Mpris
 
 // Perf is the shell's one performance-policy singleton and the single reader of
 // ~/.config/ryoku/performance.json (the file Ryoku Settings' Performance page
@@ -108,7 +109,15 @@ Singleton {
     // grace (the same binding-vs-imperative trap as the analysers' `running`).
     // onSoundingChanged + audioGrace are the sole controllers; the initial state
     // is seeded once.
-    readonly property bool sounding: Media.playing || Audio.streams.length > 0
+    readonly property bool anyMprisPlaying: {
+        var pl = (typeof Mpris !== "undefined" && Mpris.players) ? Mpris.players.values : [];
+        for (var i = 0; i < pl.length; i++) {
+            if (pl[i] && pl[i].isPlaying && !Media.isWallpaper(pl[i]))
+                return true;
+        }
+        return false;
+    }
+    readonly property bool sounding: anyMprisPlaying || Media.playing || Audio.streams.length > 0
     property bool audioIdle: true
     Component.onCompleted: root.audioIdle = !root.sounding
     onSoundingChanged: {

@@ -37,10 +37,21 @@ Singleton {
         return a;
     }
 
-    // Visible, permitted, and something actually playing: the same three
-    // questions AudioBars asks, so the two analysers cannot drift apart again.
-    // A live placement overrides the freeze so the look stays visible to aim.
-    readonly property bool analysing: root.active && (!Perf.visualizerFrozen || root.placementHolds > 0)
+    // Visible, permitted, and not hard-frozen (Power Saver, lowPowerMode, Game Mode).
+    // Captures the PipeWire playback monitor across all audio sources (Spotify,
+    // browsers, MPV, Ryotunes, etc.). When silent, cava outputs zeros and Motion
+    // stops animating, ensuring zero GPU waste without terminating cava.
+    readonly property bool analysing: root.active && (!Performance.visualizerHardFrozen || root.placementHolds > 0)
+
+    Connections {
+        target: Audio
+        function onSinkChanged() {
+            if (cavaProc.running) {
+                cavaProc.backoff = true;
+                barsRestart.restart();
+            }
+        }
+    }
 
     Process {
         id: cavaProc

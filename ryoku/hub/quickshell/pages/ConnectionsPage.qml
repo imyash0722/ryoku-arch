@@ -1192,10 +1192,7 @@ Item {
                 }
             }
 
-            // advanced: NetworkManager's Wi-Fi backend. an unobtrusive footer
-            // beneath the list; the selected engine inverts to bone, the other is
-            // tappable. rare enough to sit out of the way, but reachable when a
-            // WPA3 AP or phone hotspot won't associate under iwd.
+            // Network tools: nmtui and connection editor
             Item {
                 id: backendRow
                 anchors.left: parent.left
@@ -1219,7 +1216,7 @@ Item {
                     spacing: 2
 
                     Text {
-                        text: I18n.tr("Wi-Fi backend")
+                        text: I18n.tr("Network Tools")
                         color: Tokens.ink
                         font.family: Tokens.ui
                         font.pixelSize: Tokens.fRow
@@ -1228,7 +1225,7 @@ Item {
 
                     Text {
                         width: parent.width
-                        text: I18n.tr("Switch to wpa_supplicant if a WPA3 network or Android hotspot won\u2019t connect.")
+                        text: I18n.tr("Configure network interfaces, IP routing, and wireless profiles with NetworkManager tools.")
                         color: Tokens.inkMuted
                         font.family: Tokens.ui
                         font.pixelSize: Tokens.fMicro
@@ -1246,19 +1243,15 @@ Item {
                     Btn {
                         anchors.verticalCenter: parent.verticalCenter
                         compact: true
-                        text: I18n.tr("iwd")
-                        primary: wifi.wifiBackend === "iwd"
-                        armed: !wifi.backendBusy
-                        onAct: wifi.setBackend("iwd")
+                        text: I18n.tr("nmtui")
+                        onAct: Spawn.run(["kitty", "--class", "floating-terminal", "-e", "nmtui"])
                     }
 
                     Btn {
                         anchors.verticalCenter: parent.verticalCenter
                         compact: true
-                        text: I18n.tr("wpa_supplicant")
-                        primary: wifi.wifiBackend === "wpa_supplicant"
-                        armed: !wifi.backendBusy
-                        onAct: wifi.setBackend("wpa_supplicant")
+                        text: I18n.tr("Connection Editor")
+                        onAct: Spawn.run(["nm-connection-editor"])
                     }
                 }
             }
@@ -1500,6 +1493,12 @@ Item {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Tokens.s3
+
+                    Btn {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: I18n.tr("Bluetooth Manager")
+                        onAct: Spawn.run(["blueman-manager"])
+                    }
 
                     // scan toggle (visible only while the adapter is on).
                     // discovering inverts the button (bone) to read as the ON
