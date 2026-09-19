@@ -18,6 +18,8 @@ Singleton {
     readonly property string bin: "ryoku-desktop-preset"
     property string currentWallpaper: ""
     property string currentSlug: ""
+    property string switchingTo: ""
+    property string pendingWallpaper: ""
     property bool ready: false
     property bool suppressSave: false
 
@@ -31,25 +33,27 @@ Singleton {
     }
 
     function saveCurrent(): void {
-        if (!root.ready || root.currentWallpaper === "" || root.suppressSave) return;
+        if (!root.ready || root.currentWallpaper === "" || root.suppressSave || switchProc.running) return;
+        if (saveProc.running) return;
         saveProc.command = [root.bin, "save", root.currentWallpaper, "-q"];
-        saveProc.running = false;
         saveProc.running = true;
     }
 
     function loadCurrent(): void {
-        if (root.currentWallpaper === "") return;
+        if (root.currentWallpaper.length === 0 || switchProc.running) return;
+        autoSaveTimer.stop();
         root.suppressSave = true;
-        loadProc.command = [root.bin, "load", root.currentWallpaper, "-q"];
-        loadProc.running = false;
-        loadProc.running = true;
-        suppressTimer.restart();
+        startSwitch(root.currentWallpaper);
     }
 
-    function cleanOrphans(): void {
-        pruneProc.command = [root.bin, "prune", "-q"];
-        pruneProc.running = false;
-        pruneProc.running = true;
+    function resetCurrent(): void {
+        if (root.currentWallpaper.length === 0 || switchProc.running) return;
+        autoSaveTimer.stop();
+        root.suppressSave = true;
+        root.switchingTo = root.currentWallpaper;
+        root.pendingWallpaper = "";
+        switchProc.command = [root.bin, "reset", root.currentWallpaper, "-q"];
+        switchProc.running = true;
     }
 
     function onWallpaperChanged(newWall: string): void {
@@ -57,34 +61,60 @@ Singleton {
         if (trimmed.length === 0 || trimmed === root.currentWallpaper)
             return;
 
-        // Save layout for outgoing wallpaper if initialized
-        if (root.ready && root.currentWallpaper.length > 0 && !root.suppressSave) {
-            Quickshell.execDetached([root.bin, "save", root.currentWallpaper, "-q"]);
+        // Immediately cancel any pending auto-save and suppress saves during transition
+        autoSaveTimer.stop();
+        root.suppressSave = true;
+
+        if (switchProc.running) {
+            // A switch is already in flight; queue the latest selection
+            root.pendingWallpaper = trimmed;
+            return;
         }
 
-        root.currentWallpaper = trimmed;
-        root.currentSlug = root.slugOf(trimmed);
+        startSwitch(trimmed);
+    }
 
-        // Load preset for new wallpaper
+    function startSwitch(targetWall: string): void {
+        root.switchingTo = targetWall;
+        root.pendingWallpaper = "";
         root.suppressSave = true;
-        loadProc.command = [root.bin, "load", trimmed, "-q"];
-        loadProc.running = false;
-        loadProc.running = true;
-        suppressTimer.restart();
 
-        // Prune any stale presets for deleted wallpapers
-        cleanOrphans();
+        // If first run or manual reload of current, load directly; otherwise atomically switch outgoing and incoming
+        if (root.currentWallpaper.length === 0 || targetWall === root.currentWallpaper) {
+            switchProc.command = [root.bin, "load", targetWall, "-q"];
+        } else {
+            switchProc.command = [root.bin, "switch", root.currentWallpaper, targetWall, "-q"];
+        }
+        switchProc.running = true;
+    }
+
+    function cleanOrphans(): void {
+        if (pruneProc.running) return;
+        pruneProc.command = [root.bin, "prune", "-q"];
+        pruneProc.running = true;
+    }
+
+    Process {
+        id: switchProc
+        onExited: {
+            root.currentWallpaper = root.switchingTo;
+            root.currentSlug = root.slugOf(root.switchingTo);
+            root.switchingTo = "";
+
+            if (root.pendingWallpaper.length > 0 && root.pendingWallpaper !== root.currentWallpaper) {
+                const next = root.pendingWallpaper;
+                root.pendingWallpaper = "";
+                root.startSwitch(next);
+            } else {
+                root.pendingWallpaper = "";
+                suppressTimer.restart();
+                pruneTimer.restart();
+            }
+        }
     }
 
     Process {
         id: saveProc
-    }
-
-    Process {
-        id: loadProc
-        onExited: {
-            suppressTimer.restart();
-        }
     }
 
     Process {
@@ -93,20 +123,31 @@ Singleton {
 
     Timer {
         id: suppressTimer
-        interval: 1200
+        interval: 3000
         onTriggered: {
             root.suppressSave = false;
             root.ready = true;
         }
     }
 
+    Timer {
+        id: pruneTimer
+        interval: 4000
+        onTriggered: {
+            root.cleanOrphans();
+        }
+    }
+
     // Auto-save debounce timer when widgets or visualizer configs are edited
     Timer {
         id: autoSaveTimer
-        interval: 1000
+        interval: 2000
         onTriggered: {
-            if (!root.suppressSave && root.ready && root.currentWallpaper.length > 0) {
-                root.saveCurrent();
+            if (!root.suppressSave && root.ready && !switchProc.running && root.pendingWallpaper.length === 0) {
+                const activeWall = (wallFile.text() || "").trim();
+                if (activeWall.length > 0 && activeWall === root.currentWallpaper) {
+                    root.saveCurrent();
+                }
             }
         }
     }
@@ -135,7 +176,7 @@ Singleton {
         watchChanges: true
         printErrors: false
         onFileChanged: {
-            if (!root.suppressSave && root.ready) {
+            if (!root.suppressSave && root.ready && !switchProc.running && root.pendingWallpaper.length === 0) {
                 autoSaveTimer.restart();
             }
         }
@@ -149,7 +190,7 @@ Singleton {
         watchChanges: true
         printErrors: false
         onFileChanged: {
-            if (!root.suppressSave && root.ready) {
+            if (!root.suppressSave && root.ready && !switchProc.running && root.pendingWallpaper.length === 0) {
                 autoSaveTimer.restart();
             }
         }
@@ -163,7 +204,7 @@ Singleton {
         watchChanges: true
         printErrors: false
         onFileChanged: {
-            if (!root.suppressSave && root.ready) {
+            if (!root.suppressSave && root.ready && !switchProc.running && root.pendingWallpaper.length === 0) {
                 autoSaveTimer.restart();
             }
         }

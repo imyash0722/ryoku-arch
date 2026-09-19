@@ -16,6 +16,7 @@ import "modules/stage/Singletons" as StageCfg
 import "components"
 import "modules/wallpaper"
 import "modules/desktop"
+import "modules/desktop/Singletons" as DesktopCfg
 import "modules/visualizer"
 import "modules/bar"
 import "modules/dock"
@@ -187,7 +188,7 @@ ShellRoot {
             Visualizer {
                 id: perScreenViz
                 screen: perScreen.modelData
-                mode: !VizCfg.Config.enabled ? "off"
+                mode: (!VizCfg.Config.enabled || (DesktopCfg.Config.primaryOnly && !desktop.isPrimaryScreen)) ? "off"
                     : (perScreen.st && perScreen.st.visualizerOverlay ? "overlay" : "desktop")
                 placing: perScreen.st ? perScreen.st.visualizerPlacing : false
                 // The desktop hosts the visualizer behind the cut-outs while the

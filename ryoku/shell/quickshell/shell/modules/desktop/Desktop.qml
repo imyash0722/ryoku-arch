@@ -59,7 +59,13 @@ Scope {
         return StageCfg.Config.isFront(id) ? 5 : 3;
     }
     readonly property var stageState: Services.ShellState.forScreen(root.screen)
+    readonly property bool isPrimaryScreen: {
+        const monName = root.screen ? root.screen.name : "";
+        return monName !== "" && monName === Config.effectivePrimaryMonitor;
+    }
+    readonly property bool widgetsVisible: !Config.primaryOnly || root.isPrimaryScreen || root.stageComposing
     readonly property bool hostsVisualizer: root.stageOn && VizCfg.Config.enabled
+        && (!Config.primaryOnly || root.isPrimaryScreen)
         && !(root.stageState && (root.stageState.visualizerOverlay || root.stageState.visualizerPlacing))
     readonly property string monitorName: root.screen ? root.screen.name : ""
     // Edit widgets on this monitor frees every widget for dragging and lifts
@@ -416,7 +422,7 @@ Scope {
             asynchronous: true
             sourceSize.width: Math.ceil(width * backdrop.screenDpr)
             sourceSize.height: Math.ceil(height * backdrop.screenDpr)
-            visible: root.videoUrl === "" && ((Config.calendarEnabled && Config.calendarStyle === "glass")
+            visible: root.widgetsVisible && root.videoUrl === "" && ((Config.calendarEnabled && Config.calendarStyle === "glass")
                 || (Config.musicEnabled && Config.musicStyle === "glass"))
             fillMode: {
                 switch (root.wallpaperFit) {
@@ -485,7 +491,7 @@ Scope {
             id: clockSlot
             widget: "clock"
             z: root.widgetZ("clock")
-            visible: root.reloadReady && Config.clockEnabled
+            visible: root.reloadReady && Config.clockEnabled && root.widgetsVisible
             anchor: Config.clockAnchor
             freeX: Config.clockX
             freeY: Config.clockY
@@ -505,7 +511,7 @@ Scope {
             id: calendarSlot
             widget: "calendar"
             z: root.widgetZ("calendar")
-            visible: root.reloadReady && Config.calendarEnabled
+            visible: root.reloadReady && Config.calendarEnabled && root.widgetsVisible
             anchor: Config.calendarAnchor
             freeX: Config.calendarX
             freeY: Config.calendarY
@@ -533,7 +539,7 @@ Scope {
             id: musicSlot
             widget: "music"
             z: root.widgetZ("music")
-            visible: root.reloadReady && Config.musicEnabled
+            visible: root.reloadReady && Config.musicEnabled && root.widgetsVisible
             anchor: Config.musicAnchor
             freeX: Config.musicX
             freeY: Config.musicY
@@ -564,7 +570,7 @@ Scope {
             id: aioSlot
             widget: "aio"
             z: root.widgetZ("aio")
-            visible: root.reloadReady && Config.aioEnabled
+            visible: root.reloadReady && Config.aioEnabled && root.widgetsVisible
             anchor: Config.aioAnchor
             freeX: Config.aioX
             freeY: Config.aioY
@@ -586,7 +592,7 @@ Scope {
             id: statsSlot
             widget: "stats"
             z: root.widgetZ("stats")
-            visible: root.reloadReady && Config.statsEnabled
+            visible: root.reloadReady && Config.statsEnabled && root.widgetsVisible
             anchor: Config.statsAnchor
             freeX: Config.statsX
             freeY: Config.statsY
@@ -607,7 +613,7 @@ Scope {
             id: weatherSlot
             widget: "weather"
             z: root.widgetZ("weather")
-            visible: root.reloadReady && Config.weatherEnabled
+            visible: root.reloadReady && Config.weatherEnabled && root.widgetsVisible
             anchor: Config.weatherAnchor
             freeX: Config.weatherX
             freeY: Config.weatherY
@@ -629,7 +635,7 @@ Scope {
             id: notesSlot
             widget: "notes"
             z: root.widgetZ("notes")
-            visible: root.reloadReady && Config.notesEnabled
+            visible: root.reloadReady && Config.notesEnabled && root.widgetsVisible
             anchor: Config.notesAnchor
             freeX: Config.notesX
             freeY: Config.notesY
@@ -675,7 +681,7 @@ Scope {
                     ? "?v=" + encodeURIComponent(entry.version) : ""
 
                 pluginId: slot.pid
-                visible: root.reloadReady
+                visible: root.reloadReady && root.widgetsVisible
                 locked: root.stageComposing ? false : (slot.dw.locked === true)
                 composing: root.stageComposing
                 scaleCfg: slot.dw.scale || 0.85
@@ -817,7 +823,7 @@ Scope {
 
         // Menus sit above the whole stage stack (backdrop z 1, layers up to z 5),
         // or a Parallax backdrop paints over an open right-click menu.
-        WidgetMenu { id: menu; z: 90 }
+        WidgetMenu { id: menu; z: 90; screen: root.screen }
 
         // per-tile right-click menu, hoisted to PanelWindow level so the
         // click-away catcher covers the whole desktop and a tile that

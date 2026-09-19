@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import shell.services as Services
 
 // Live config for the wallpaper clock. Ryoku Settings, desktop dragging and the
 // right-click menu share widgets.json; FileView watches it so every surface
@@ -9,6 +10,24 @@ import Quickshell.Io
 Singleton {
     id: root
     property bool ready: false
+
+    // -- monitor policy ------------------------------------------------------
+    property alias primaryOnly:    adapter.primaryOnly
+    property alias primaryMonitor: adapter.primaryMonitor
+
+    readonly property string effectivePrimaryMonitor: {
+        const screens = Services.ShellState.screens;
+        if (!screens || screens.length === 0) {
+            return Quickshell.screens.length > 0 && Quickshell.screens[0] ? Quickshell.screens[0].name : "";
+        }
+        if (root.primaryMonitor && root.primaryMonitor.length > 0) {
+            for (let i = 0; i < screens.length; ++i) {
+                if (screens[i] && screens[i].name === root.primaryMonitor)
+                    return root.primaryMonitor;
+            }
+        }
+        return screens[0] ? screens[0].name : "";
+    }
 
     // -- clock ---------------------------------------------------------------
     property alias clockEnabled: adapter.clockEnabled
@@ -275,6 +294,8 @@ Singleton {
             property string notesColor: ""
             property string notesColor2: ""
             property bool notesGradient: false
+            property bool primaryOnly: false
+            property string primaryMonitor: ""
         }
     }
 

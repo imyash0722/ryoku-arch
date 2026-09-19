@@ -22,6 +22,7 @@ Item {
     anchors.fill: parent
 
     property string scope: "desktop"   // desktop | clock
+    property var screen: null
 
     readonly property bool isWidget: menu.scope !== "desktop"
     readonly property bool isClock: menu.scope === "clock"
@@ -131,6 +132,8 @@ Item {
     // The three editors and the visualizer's own editor (docs/stage.md, "The
     // desktop right-click menu"). Sessions open on the monitor the menu is on.
     function activeMonitor() {
+        if (menu.screen && menu.screen.name)
+            return menu.screen.name;
         const st = Services.ShellState.forActive();
         return (st && st.modelData) ? st.modelData.name : "";
     }
@@ -193,16 +196,38 @@ Item {
         MenuSection { visible: !menu.isWidget }
         MenuRow {
             visible: !menu.isWidget
-            label: I18n.tr("Preset: %1").arg(DesktopPresets.currentSlug || "Default")
+            label: I18n.tr("Primary monitor only")
+            value: Config.primaryOnly ? I18n.tr("On") : I18n.tr("Off")
+            on: Config.primaryOnly
+            closeOnTrigger: false
+            onTriggered: Config.toggle("primaryOnly")
+        }
+        MenuRow {
+            visible: !menu.isWidget && Services.ShellState.screens.length > 1
+            label: I18n.tr("Set as primary monitor")
+            value: menu.activeMonitor() === Config.effectivePrimaryMonitor ? I18n.tr("Current") : I18n.tr("Set")
+            closeOnTrigger: false
+            onTriggered: Config.set("primaryMonitor", menu.activeMonitor())
+        }
+        MenuSection { visible: !menu.isWidget }
+        MenuRow {
+            visible: !menu.isWidget
+            label: I18n.tr("Preset: %1").arg(Services.DesktopPresets.currentSlug || "Default")
             value: I18n.tr("Save")
             closeOnTrigger: false
-            onTriggered: DesktopPresets.saveCurrent()
+            onTriggered: Services.DesktopPresets.saveCurrent()
         }
         MenuRow {
             visible: !menu.isWidget
             label: I18n.tr("Reload preset")
             closeOnTrigger: false
-            onTriggered: DesktopPresets.loadCurrent()
+            onTriggered: Services.DesktopPresets.loadCurrent()
+        }
+        MenuRow {
+            visible: !menu.isWidget
+            label: I18n.tr("Reset preset")
+            closeOnTrigger: false
+            onTriggered: Services.DesktopPresets.resetCurrent()
         }
 
         // ── widget scope ───────────────────────────────────────────────
