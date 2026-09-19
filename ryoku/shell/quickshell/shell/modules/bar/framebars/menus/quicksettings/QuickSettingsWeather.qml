@@ -17,6 +17,7 @@ Item {
     // it this transparent module ghosts the page behind it. Matches the home tab.
     Rectangle {
         anchors.fill: parent
+        radius: Config.frameCorner
         color: Theme.surface
     }
 

@@ -259,7 +259,7 @@ var rows = [{
         "label": "Corner radius",
         "desc": "How rounded window corners are, 0 keeps them square",
         "ctl": "step",
-        "src": "settings.lua)",
+        "src": "settings.lua",
         "lo": 0.0,
         "hi": 30.0,
         "unit": "px"

@@ -37,11 +37,6 @@ Item {
         enabled: root.open
     }
 
-    Rectangle {
-        anchors.fill: parent
-        color: Theme.surface
-    }
-
     Item {
         id: header
         anchors.top: parent.top
@@ -180,8 +175,8 @@ Item {
         id: homeFlick
         anchors.top: header.bottom
         anchors.topMargin: 10
-        anchors.bottom: powerDock.top
-        anchors.bottomMargin: 8
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 12
         anchors.left: parent.left
         anchors.leftMargin: 12
         anchors.right: parent.right
@@ -322,51 +317,21 @@ Item {
                 active: root.open
             }
 
-            Menus.QsSection { width: parent.width; label: I18n.tr("Calendar") }
-            Menus.QsCalendarEmbed {
+            Menus.QsSection {
+                visible: PowerProfiles.available
                 width: parent.width
-                s: 1
-                open: root.open
+                label: I18n.tr("Power")
             }
-
-            Menus.QsSection { width: parent.width; label: I18n.tr("System") }
-            SysMonitor {
+            Menus.QsSeg {
+                visible: PowerProfiles.available
                 width: parent.width
-                s: 1
-                active: root.open
+                current: PowerProfiles.profile
+                options: PowerProfiles.profiles.map(profile => ({
+                    id: profile,
+                    label: profile === "power-saver" ? I18n.tr("Saver") : profile.charAt(0).toUpperCase() + profile.slice(1)
+                }))
+                onChose: profile => PowerProfiles.setProfile(profile)
             }
-        }
-    }
-
-    Column {
-        id: powerDock
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        anchors.left: parent.left
-        anchors.leftMargin: 12
-        anchors.right: parent.right
-        anchors.rightMargin: 12
-        spacing: 6
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Qt.rgba(Theme.onSurface.r, Theme.onSurface.g, Theme.onSurface.b, 0.10)
-        }
-        Menus.QsSection {
-            visible: PowerProfiles.available
-            width: parent.width
-            label: I18n.tr("Power")
-        }
-        Menus.QsSeg {
-            visible: PowerProfiles.available
-            width: parent.width
-            current: PowerProfiles.profile
-            options: PowerProfiles.profiles.map(profile => ({
-                id: profile,
-                label: profile === "power-saver" ? I18n.tr("Saver") : profile.charAt(0).toUpperCase() + profile.slice(1)
-            }))
-            onChose: profile => PowerProfiles.setProfile(profile)
         }
     }
 }

@@ -39,7 +39,7 @@ Item {
     // Forwarded to FrameSurface for the Ryoku-own surface popouts.
     property var group: null
     property real frameThickness: 0
-    property real radius: 8
+    property real radius: Config.frameCorner
     property real smoothing: 0
 
     signal requestClose()

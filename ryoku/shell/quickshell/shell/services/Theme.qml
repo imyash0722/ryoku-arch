@@ -185,8 +185,8 @@ Singleton {
     readonly property int shadowOffset: 3
 
     // --- sizing (compiled defaults; frameOpacity is the Config knob) ----------
-    readonly property int  radiusWidget: 8
-    readonly property int  radiusWindow: 8
+    readonly property real radiusWidget: Math.max(6, Math.round(Config.frameCorner * 0.75))
+    readonly property real radiusWindow: Config.frameCorner
     readonly property int  borderWidth: 2
     readonly property int  paddingSm: 4
     readonly property int  paddingMd: 8

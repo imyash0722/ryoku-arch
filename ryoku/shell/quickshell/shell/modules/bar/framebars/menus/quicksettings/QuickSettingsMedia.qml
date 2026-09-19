@@ -15,6 +15,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
+        radius: Config.frameCorner
         color: Theme.surface
     }
 

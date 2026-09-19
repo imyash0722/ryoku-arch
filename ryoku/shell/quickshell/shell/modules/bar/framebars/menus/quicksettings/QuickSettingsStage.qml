@@ -330,7 +330,7 @@ Item {
 
     // --- the page ------------------------------------------------------------
 
-    Rectangle { anchors.fill: parent; color: Theme.surface }
+    Rectangle { anchors.fill: parent; radius: Config.frameCorner; color: Theme.surface }
 
     Flickable {
         anchors.fill: parent

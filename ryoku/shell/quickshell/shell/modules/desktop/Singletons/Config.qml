@@ -26,6 +26,13 @@ Singleton {
                     return root.primaryMonitor;
             }
         }
+        const active = Services.ShellState.forActive();
+        if (active && active.modelData && active.modelData.name) {
+            for (let i = 0; i < screens.length; ++i) {
+                if (screens[i] && screens[i].name === active.modelData.name)
+                    return active.modelData.name;
+            }
+        }
         return screens[0] ? screens[0].name : "";
     }
 

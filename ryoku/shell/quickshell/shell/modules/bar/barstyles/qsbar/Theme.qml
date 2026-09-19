@@ -871,8 +871,8 @@ Item {
     readonly property int   barShellShadowOffset: barShadowEnabled ? 5 : 2
     // Popovers, tooltips and their interactive tiles share the calmer V2 shape;
     // bar-widget pills remain independently configurable below.
-    readonly property int panelRadius: 6
-    readonly property int panelButtonRadius: 6
+    readonly property int panelRadius: Math.max(barCornerRadius, (Config.frameCorner > 0 ? Config.frameCorner : 10))
+    readonly property int panelButtonRadius: Math.max(6, Math.round(panelRadius * 0.6))
     readonly property color panelBorder: v2BarBorder
     readonly property int panelBorderW: 1
     readonly property color panelOuterBorderColor: panelTooltipBorderEnabled
@@ -2663,7 +2663,7 @@ Item {
     property var widgetGeom: ({})
     function widgetGeomOf(gid) { var g = widgetGeom[gid]; return g ? g : ({}) }
     function widgetPad(gid) { var g = widgetGeomOf(gid); return g.pad !== undefined ? g.pad : 0 }
-    function widgetRadius(gid) { var g = widgetGeomOf(gid); return (g.radius !== undefined && g.radius >= 0) ? g.radius : panelButtonRadius }
+    function widgetRadius(gid) { var g = widgetGeomOf(gid); return (g.radius !== undefined && g.radius >= 0) ? g.radius : Math.min(12, Math.max(panelButtonRadius, barCornerRadius)) }
     function widgetOpacity(gid) { var g = widgetGeomOf(gid); return (g.opacity !== undefined && g.opacity >= 0) ? g.opacity : 1 }
     function widgetGeomCustomized(gid) { return widgetGeom[gid] !== undefined }
     function setWidgetGeom(gid, key, value) {
