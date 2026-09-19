@@ -289,8 +289,9 @@ def cmd_load(args):
         do_load(config_dir, presets_dir, system_dirs, wall, slug, quiet=getattr(args, "quiet", False))
         if args.wallpaper:
             try:
-                expanded = str(Path(os.path.expanduser(args.wallpaper)).resolve())
-                (state_dir / "ryoku-wallpaper").write_text(expanded + "\n", encoding="utf-8")
+                p = Path(os.path.expanduser(args.wallpaper))
+                if p.is_file():
+                    (state_dir / "ryoku-wallpaper").write_text(str(p.resolve()) + "\n", encoding="utf-8")
             except Exception:
                 pass
 
