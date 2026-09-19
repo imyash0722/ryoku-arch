@@ -83,6 +83,14 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name   = "float-qimgv",
+    match  = { class = "qimgv" },
+    float  = true,
+    size   = fit(1400, 900),
+    center = true,
+})
+
+hl.window_rule({
     name   = "float-filemanager",
     match  = { class = "(org.gnome.Nautilus|org.kde.dolphin)" },
     float  = true,

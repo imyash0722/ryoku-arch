@@ -886,6 +886,28 @@ done
                             onAct: Spawn.run(["kitty", "--class", "floating-terminal", "-e", "sh", "-c", "sudo tlp-stat -s; echo; read -n1 -rsp 'Press any key to close…'"])
                         }
                     }
+
+                    SettingRow {
+                        anchors.left: parent.left; anchors.right: parent.right
+                        divider: true
+                        label: I18n.tr("PowerTOP Diagnostics")
+                        desc: I18n.tr("Real-time power consumption, per-device wakeups, and wattage analysis.")
+                        controlWidth: 220
+                        Row {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Tokens.s2
+                            Btn {
+                                compact: true
+                                text: I18n.tr("Live PowerTOP")
+                                onAct: Spawn.run(["kitty", "--class", "floating-terminal", "-e", "sudo", "powertop"])
+                            }
+                            Btn {
+                                compact: true
+                                text: I18n.tr("Full Report")
+                                onAct: Spawn.run(["kitty", "--class", "floating-terminal", "-e", "ryoku-power-report", "--html"])
+                            }
+                        }
+                    }
                 }
 
                 // ── BATTERY ──
