@@ -67,3 +67,11 @@ __pycache__/
 .prowl/setup-applies.json
 .prowl-setup.lock
 # /prowl-agent: derived state
+
+# User-specific desktop overrides and local machine state (never commit personal configs)
+rebinds.lua
+settings.lua
+monitors_user.lua
+user_edits/
+*.local.lua
+*.local.json
