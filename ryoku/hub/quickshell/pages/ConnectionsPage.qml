@@ -1497,7 +1497,7 @@ Item {
                     Btn {
                         anchors.verticalCenter: parent.verticalCenter
                         text: I18n.tr("Bluetooth Manager")
-                        onAct: Spawn.run(["blueman-manager"])
+                        onAct: Spawn.run(["sh", "-c", "if command -v blueman-manager >/dev/null 2>&1; then exec blueman-manager; else exec kitty --class floating-terminal -e bluetoothctl; fi"])
                     }
 
                     // scan toggle (visible only while the adapter is on).
