@@ -44,6 +44,8 @@ package() {
     "$pkgdir/usr/bin/ryoku-eq"
   install -Dm755 "$_repo/ryoku/shell/scripts/ryoku-desktop-preset" \
     "$pkgdir/usr/bin/ryoku-desktop-preset"
+  install -Dm755 "$_repo/ryoku/shell/scripts/ryoku-matugen-kde-sync" \
+    "$pkgdir/usr/bin/ryoku-matugen-kde-sync"
   install -d "$pkgdir/usr/share/ryoku/reload-cover"
   cp -a "$_repo/ryoku/shell/quickshell/reload-cover/." "$pkgdir/usr/share/ryoku/reload-cover/"
   install -d "$pkgdir/usr/share/ryoku/desktop_presets"

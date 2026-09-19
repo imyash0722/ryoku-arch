@@ -39,7 +39,12 @@ fallback() {
 		else echo "chromium"; fi ;;
 	terminal) echo "kitty" ;;
 	editor)   echo "kitty -e nvim" ;;
-	files)    echo "dolphin" ;;
+	files)
+		if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/dolphin/dolphin.qss" ]; then
+			echo "env QT_QPA_PLATFORMTHEME=kde dolphin -stylesheet ${XDG_CONFIG_HOME:-$HOME/.config}/dolphin/dolphin.qss"
+		else
+			echo "env QT_QPA_PLATFORMTHEME=kde dolphin"
+		fi ;;
 	*)        echo "" ;;
 	esac
 }

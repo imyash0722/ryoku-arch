@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Syncs Ryoku's Matugen color scheme to KDE applications (Dolphin, etc.)
+# Generates valid KDE .colors files, applies them via plasma-apply-colorscheme,
+# and broadcasts PaletteChanged (0) and StyleChanged (2) DBus reload signals
+# to force all running Qt/KDE apps to re-polish and update background & view colors live.
+set -euo pipefail
+
+# Fork to background so matugen is never blocked
+if [ "${1:-}" != "--worker" ]; then
+    nohup "$0" --worker >/dev/null 2>&1 &
+    exit 0
+fi
+
+SCHEMES_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/color-schemes"
+CONF="${XDG_CACHE_HOME:-$HOME/.cache}/ryoku/kdeglobals-colors.conf"
+
+[ -f "$CONF" ] || exit 0
+mkdir -p "$SCHEMES_DIR"
+
+notify_kde_apps() {
+    if command -v dbus-send >/dev/null 2>&1; then
+        # PaletteChanged (0): reloads palette
+        dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 >/dev/null 2>&1 || true
+        # StyleChanged (2): forces QApplication::setStyle and QWindowSystemInterface::handleThemeChange()
+        # which flushes cached background brushes (Darkly) and re-polishes all viewports (DolphinView)
+        dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:2 int32:0 >/dev/null 2>&1 || true
+    fi
+
+    # Trigger view_redisplay on all running Dolphin instances to instantly redraw the file item canvas
+    if command -v qdbus6 >/dev/null 2>&1; then
+        for app in $(qdbus6 2>/dev/null | grep -E '^org\.kde\.dolphin'); do
+            qdbus6 "$app" /dolphin/Dolphin_1/actions/view_redisplay trigger >/dev/null 2>&1 || true
+        done
+    elif command -v qdbus >/dev/null 2>&1; then
+        for app in $(qdbus 2>/dev/null | grep -E '^org\.kde\.dolphin'); do
+            qdbus "$app" /dolphin/Dolphin_1/actions/view_redisplay trigger >/dev/null 2>&1 || true
+        done
+    fi
+}
+
+# Step 1: Write Ryoku2 and Ryoku color scheme files from rendered Matugen output
+(cat "$CONF"; printf "\n[General]\nColorScheme=Ryoku2\nName=Ryoku2\n") > "$SCHEMES_DIR/Ryoku2.colors"
+(cat "$CONF"; printf "\n[General]\nColorScheme=Ryoku\nName=Ryoku\n") > "$SCHEMES_DIR/Ryoku.colors"
+
+# Step 2: Immediate apply so running KDE apps switch without delay
+if command -v plasma-apply-colorscheme >/dev/null 2>&1; then
+    plasma-apply-colorscheme "$SCHEMES_DIR/Ryoku2.colors" >/dev/null 2>&1 || true
+    plasma-apply-colorscheme "$SCHEMES_DIR/Ryoku.colors" >/dev/null 2>&1 || true
+fi
+
+notify_kde_apps
+
+# Step 3: Wait for ryoku-shell daemon to finish its background applyKdeColors() merge,
+# then fire a final reload notification so running apps remain perfectly synchronized.
+sleep 1.0
+
+notify_kde_apps
+
+exit 0

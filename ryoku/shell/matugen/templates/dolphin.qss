@@ -1,0 +1,16 @@
+/* Dolphin Dynamic Matugen Stylesheet */
+/* Ensures visible separator and subtle boundary between Places sidebar and file view */
+
+QMainWindow::separator {
+    background-color: palette(mid);
+    width: 2px;
+    height: 2px;
+}
+
+QMainWindow::separator:hover {
+    background-color: palette(highlight);
+}
+
+QDockWidget {
+    border-right: 1px solid palette(mid);
+}

@@ -44,3 +44,13 @@ output_path = "~/.config/qt6ct/colors/ryoku.conf"
 [templates.kde]
 input_path = "~/.config/matugen/templates/kdeglobals"
 output_path = "~/.cache/ryoku/kdeglobals-colors.conf"
+    post_hook = "command -v ryoku-matugen-kde-sync >/dev/null && ryoku-matugen-kde-sync; true"
+
+[templates.dolphin]
+input_path = "~/.config/matugen/templates/dolphin.qss"
+output_path = "~/.config/dolphin/dolphin.qss"
+
+[templates.neovim]
+input_path = "~/.config/matugen/templates/nvim-colors.json"
+output_path = "~/.cache/matugen/nvim-colors.json"
+    post_hook = "pkill -SIGUSR1 nvim || true"
