@@ -175,6 +175,9 @@ dolphin-plugins
 kio-admin
 xdg-desktop-portal-kde
 kimageformats
+kdeconnect
+sshfs
+
 
 
 # Virtual machines (Ryoku Settings > GPU > Machine): a windowed VM runs in QEMU

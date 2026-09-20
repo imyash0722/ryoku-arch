@@ -241,6 +241,8 @@ optdepends=(
   'dolphin-plugins: extra plugins for Dolphin file manager'
   'kio-admin: manage files as administrator in Dolphin'
   'xdg-desktop-portal-kde: KDE Dolphin file picker dialog portal for browsers and apps'
+  'kdeconnect: seamless device integration across Linux and Android'
+  'sshfs: remote file browsing over KDE Connect'
   'ryotunes: the Ryoku music app the now-playing widget follows'
 
   'ryomotion: screen-demo recorder and editor'

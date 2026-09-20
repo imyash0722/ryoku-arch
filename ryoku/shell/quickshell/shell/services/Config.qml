@@ -220,6 +220,31 @@ Singleton {
         JsonAdapter { id: themeAdapter; property bool followWallpaper: true }
     }
 
+    // Hyprland appearance store (owned by ryoku-hub, hypr.json)
+    FileView {
+        id: hyprFile
+        path: (Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")) + "/ryoku/hypr.json"
+        blockLoading: true
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        JsonAdapter {
+            id: hyprAdapter
+            property var appearance: ({
+                "gapsIn": 4,
+                "gapsOut": 6,
+                "borderSize": 2,
+                "rounding": 13
+            })
+        }
+    }
+
+    readonly property real windowGapsOut: (hyprAdapter.appearance && typeof hyprAdapter.appearance.gapsOut === "number") ? hyprAdapter.appearance.gapsOut : 6
+    readonly property real windowGapsIn: (hyprAdapter.appearance && typeof hyprAdapter.appearance.gapsIn === "number") ? hyprAdapter.appearance.gapsIn : 4
+    readonly property real windowRounding: (hyprAdapter.appearance && typeof hyprAdapter.appearance.rounding === "number") ? hyprAdapter.appearance.rounding : 13
+    readonly property real windowBorderSize: (hyprAdapter.appearance && typeof hyprAdapter.appearance.borderSize === "number") ? hyprAdapter.appearance.borderSize : 2
+
+
     // brand identity master (mark + name), shared with doctor and the
     // Hub's Shell -> Global editor. seeded once on first run below.
     FileView {

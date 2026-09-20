@@ -1,8 +1,10 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell.Widgets
 import "framebars/menus"
 import shell.services
+
 
 // One reference frame menu (contract 05 sec 7). It is NOT a window, overlay
 // card or blob: the shell paints its background as a scene-graph extension of
@@ -39,7 +41,7 @@ Item {
     // Forwarded to FrameSurface for the Ryoku-own surface popouts.
     property var group: null
     property real frameThickness: 0
-    property real radius: Config.frameCorner
+    property real radius: Theme.radiusWindow
     property real smoothing: 0
 
     signal requestClose()
@@ -59,7 +61,7 @@ Item {
     readonly property bool retainBody: root.isMenu && root.fillsBand
     readonly property bool bodyReady: menuBody.status === Loader.Ready
         && !!(menuBody.item && menuBody.item.ready)
-    readonly property bool stableSidePanel: root.sideMenu && root.manager
+    readonly property bool stableSidePanel: root.isSidebar && root.manager
         && !!root.manager.activeMenu && !root.manager.chromeSwitchPending
         && root.manager.waitingChromeId === ""
         && root.manager.chromeReveal > 0.996 && root.manager.chromeOpacity > 0.996
@@ -75,9 +77,13 @@ Item {
     readonly property real clR: root.clearances && typeof root.clearances.right === "number" ? root.clearances.right : 0
     readonly property real clT: root.clearances && typeof root.clearances.top === "number" ? root.clearances.top : 0
     readonly property real clB: root.clearances && typeof root.clearances.bottom === "number" ? root.clearances.bottom : 0
+    readonly property real windowGap: Config.windowGapsOut !== undefined ? Config.windowGapsOut : 6
+    readonly property bool isSidebar: root.sideMenu || root.fillsBand
+
     // Band height available to a side menu = monitor height minus the top and
-    // bottom bar thicknesses (contract 05 sec 7, H = MH - T - B).
-    readonly property real bandH: Math.max(0, root.height - root.clT - root.clB)
+    // bottom bar thicknesses (contract 05 sec 7, H = MH - T - B), and minus
+    // the top and bottom window gaps for full-height sidebars to match window height.
+    readonly property real bandH: Math.max(0, root.height - root.clT - root.clB - (root.isSidebar ? root.windowGap * 2 : 0))
 
     readonly property string edge: root.anchor.indexOf("top") === 0 ? "top"
         : root.anchor.indexOf("bottom") === 0 ? "bottom"
@@ -104,7 +110,7 @@ Item {
     // Resting panel rect in window coords (contract 05 sec 7). Width is exactly
     // minimumWidth; the manager animates the panel to and from this target.
     readonly property real restW: root.minWidth
-    readonly property real restH: (root.sideMenu || root.fillsBand) ? root.bandH : Math.min(root.contentH, root.bandH)
+    readonly property real restH: root.isSidebar ? root.bandH : Math.min(root.contentH, root.bandH)
     // A top/bottom menu opens over the widget that summoned it, clamped inside
     // the side rails, instead of always jumping to the centre of the screen --
     // the same "grows out of its trigger" reading the side rails already give.
@@ -112,10 +118,13 @@ Item {
         if (root.triggerAlong < 0) return (root.clL + root.width - root.clR) / 2 - w / 2;
         return Math.max(root.clL, Math.min(root.width - root.clR - w, root.triggerAlong - w / 2));
     }
-    readonly property real restX: root.atLeft ? root.clL
-        : root.atRight ? (root.width - root.clR - root.restW)
+    readonly property real restX: root.atLeft ? (root.clL + (root.isSidebar ? root.windowGap : 0))
+        : root.atRight ? (root.width - root.clR - root.restW - (root.isSidebar ? root.windowGap : 0))
         : root.alongX(root.restW)
-    readonly property real restY: root.atBottom ? (root.height - root.clB - root.restH) : root.clT
+    readonly property real restY: root.atBottom
+        ? (root.height - root.clB - (root.isSidebar ? root.windowGap : 0) - root.restH)
+        : (root.clT + (root.isSidebar ? root.windowGap : 0))
+
 
     // The animated panel is shared by one menu at a time. A cross-anchor swap
     // keeps the incoming body hidden until the manager has retracted the
@@ -133,16 +142,12 @@ Item {
         if (!root.isMenu || !root.menuOpen || !root.manager
                 || (root.retainBody && !root.bodyReady))
             return;
-        // Compute the rect atomically from width/height so a top-anchored y
-        // never lags a just-changed height.
         const w = root.restW;
         const h = root.restH;
-        const x = root.atLeft ? root.clL
-            : root.atRight ? (root.width - root.clR - w)
-            : root.alongX(w);
-        const y = root.atBottom ? (root.height - root.clB - h) : root.clT;
+        const x = root.restX;
+        const y = root.restY;
         root.manager.setChromeSource(root.record.id, root.anchor, x, y, w, h,
-            root.sideMenu || root.fillsBand);
+            root.isSidebar);
     }
     onMenuOpenChanged: {
         if (root.menuOpen && root.retainBody && !root.bodyReady && root.manager)
@@ -179,42 +184,41 @@ Item {
         width: root.panel ? root.panel.w : 0
         height: root.panel ? root.panel.h : 0
 
-        // A folder bar style hides the frame band, so a menu that would ride it
-        // paints its own card here instead, in the same rect the band would fill.
-        Rectangle {
-            visible: !!(root.manager && root.manager.topBar)
-            x: menuBody.x
-            y: menuBody.y
+        readonly property real bodyX: root.atLeft ? 0
+            : root.atRight ? (clipHost.width - root.restW)
+            : ((clipHost.width - root.restW) / 2)
+        readonly property real bodyY: root.atBottom ? (clipHost.height - root.restH) : 0
+
+        ClippingRectangle {
+            id: menuCardClip
+            x: clipHost.bodyX
+            y: clipHost.bodyY
             width: root.restW
             height: root.restH
             radius: root.radius
-            color: Theme.surface
-            border.width: Theme.borderWidth
+            color: (root.manager && root.manager.topBar) ? Theme.surface : "transparent"
+            border.width: (root.manager && root.manager.topBar) ? Theme.borderWidth : 0
             border.color: Theme.outline
-            opacity: Theme.windowOpacity
-        }
+            opacity: (root.manager && root.manager.topBar) ? Theme.windowOpacity : 1
+            contentUnderBorder: true
 
-        Loader {
-            id: menuBody
-            active: root.isMenu && (root.effectiveOpen || root.retainBody)
-            // The band-filling quick-settings body is retained between opens
-            // and incubated before first use. Content-sized menus still load
-            // synchronously because their measured height defines the band.
-            asynchronous: root.retainBody
-            width: root.restW
-            height: root.restH
-            // A moving sidebar fades as one surface with its background. Once
-            // settled, same-anchor replacements use each body's local crossfade.
-            x: root.atLeft ? 0
-                : root.atRight ? (clipHost.width - root.restW)
-                : ((clipHost.width - root.restW) / 2)
-            y: root.atBottom ? (clipHost.height - root.restH) : 0
-            opacity: menuBody.status === Loader.Ready
-                ? ((root.sideMenu && root.manager)
-                    ? root.manager.chromeOpacity * (root.stableSidePanel ? root.bodyReveal : 1)
-                    : root.bodyReveal)
-                : 0
-            sourceComponent: menuColumnBody
+            Loader {
+                id: menuBody
+                active: root.isMenu && (root.effectiveOpen || root.retainBody)
+                // The band-filling quick-settings body is retained between opens
+                // and incubated before first use. Content-sized menus still load
+                // synchronously because their measured height defines the band.
+                asynchronous: root.retainBody
+                anchors.fill: parent
+                // A moving sidebar fades as one surface with its background. Once
+                // settled, same-anchor replacements use each body's local crossfade.
+                opacity: menuBody.status === Loader.Ready
+                    ? ((root.isSidebar && root.manager)
+                        ? root.manager.chromeOpacity * (root.stableSidePanel ? root.bodyReveal : 1)
+                        : root.bodyReveal)
+                    : 0
+                sourceComponent: menuColumnBody
+            }
         }
     }
 

@@ -123,6 +123,15 @@ Scope {
 
         // fold qsbar's shared menus to whichever edge its bar sits on
         readonly property string qsBarEdge: (!root.sumiActive && Config.qsbar && Config.qsbar.barPosition === "bottom") ? "bottom" : "top"
+        readonly property real qsBarThickness: {
+            if (root.sumiActive) return 0;
+            const gapTop = (Config.qsbar && typeof Config.qsbar.barGapTop === "number") ? Config.qsbar.barGapTop : 3;
+            const gapBottom = (Config.qsbar && typeof Config.qsbar.barGapBottom === "number") ? Config.qsbar.barGapBottom : 0;
+            const barScale = (Config.qsbar && typeof Config.qsbar.barScale === "number") ? Config.qsbar.barScale : 1;
+            const v2BarHeight = Math.round(33 * barScale);
+            return gapTop + v2BarHeight + gapBottom + 3;
+        }
+
         readonly property var edgeReveal: ({
             top: root.edgeRevealed("top"),
             bottom: root.edgeRevealed("bottom"),
@@ -315,7 +324,7 @@ Scope {
                 y: frameMenus.chromePanel.y
                 width: frameMenus.chromePanel.w
                 height: frameMenus.chromePanel.h
-                radius: Math.min(Config.frameCorner, width / 2, height / 2)
+                radius: Math.min(Theme.radiusWindow, width / 2, height / 2)
                 color: Theme.surface
                 border.width: Theme.borderWidth
                 border.color: Theme.outline
@@ -379,7 +388,7 @@ Scope {
                     left: overlay.railClearance("left"),
                     bottom: overlay.railClearance("bottom"),
                     right: overlay.railClearance("right")
-                }) : (overlay.qsBarEdge === "bottom" ? ({ top: 0, left: 0, bottom: 52, right: 0 }) : ({ top: 52, left: 0, bottom: 0, right: 0 }))
+                }) : (overlay.qsBarEdge === "bottom" ? ({ top: 0, left: 0, bottom: overlay.qsBarThickness, right: 0 }) : ({ top: overlay.qsBarThickness, left: 0, bottom: 0, right: 0 }))
                 active: !overlay.monFullscreen
                 onSurfaceClosed: (id, context) => surfaceLifecycle.handleClosed(id, context)
 
