@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/vnd.appimage;application/x-iso9660-appimage;application/x-executable;application/vnd.flatpak;application/vnd.flatpak.ref;application/vnd.flatpak.repo;application/vnd.debian.binary-package;application/x-deb;application/x-debian-package;application/x-rpm;application/x-compressed-tar;application/x-xz-compressed-tar;application/x-bzip-compressed-tar;application/x-zstd-compressed-tar;application/x-tar;application/gzip;application/x-gzip;application/x-bzip2;application/x-xz;application/zstd;application/x-zstd;
+Actions=InstallWithRyoku;
+
+[Desktop Action InstallWithRyoku]
+Name=Install with Ryoku
+Icon=system-software-install
+Exec=sh -c 'for f in "$@"; do RYOKU_STASH_KEEP=1 "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/stash-install.sh" "$f"; done' dummy %F

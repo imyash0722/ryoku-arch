@@ -1,4 +1,5 @@
 [Default Applications]
+inode/directory=org.kde.dolphin.desktop
 text/plain=ryoku-nvim.desktop
 text/markdown=ryoku-nvim.desktop
 application/json=ryoku-nvim.desktop

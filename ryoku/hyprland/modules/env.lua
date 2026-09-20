@@ -50,11 +50,9 @@ hl.env("QT_QPA_PLATFORM",                "wayland;xcb")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR",    "1")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 
--- GTK4 apps (nautilus, the file manager) hang at startup on wlroots compositors:
--- the default renderer opens its display through org.gnome.Mutter.ServiceChannel,
--- which only exists under GNOME's Mutter, so on Hyprland it never connects. The
--- GL renderer takes a direct Wayland path instead, so pin it: a GTK stack upgrade
--- must never leave the file manager unable to open.
+-- GTK4 apps hang at startup on wlroots compositors when using the default
+-- renderer (which tries to connect to Mutter's ServiceChannel). The GL renderer
+-- takes a direct Wayland path instead:
 hl.env("GSK_RENDERER", "gl")
 
 -- qt6ct, not kde: the kde platform theme reads ~/.config/kdeglobals (which the

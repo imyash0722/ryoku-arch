@@ -132,7 +132,7 @@ The small daemons and utilities the desktop leans on every session.
 | `chromium` | The web browser |
 | `kitty` | The default terminal |
 | `mpv`, `mpv-mpris` | The media player, wired onto the players bus |
-| `nautilus`, `nautilus-python` | The file manager and its "Install / Compress / Send with Ryoku" right-click actions |
+| `dolphin`, `dolphin-plugins`, `kio-admin` | The default file manager and its "Install / Compress with Ryoku" right-click service menus |
 
 Every application on this page is yours to remove. Ryoku installs an app once
 (on the ISO, or on the first `ryoku update` after a release adds it) and records

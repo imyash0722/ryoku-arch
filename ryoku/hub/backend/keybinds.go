@@ -270,7 +270,7 @@ func describeExec(cmd string) string {
 	switch {
 	case cmd == "kitty":
 		return "terminal"
-	case cmd == "nautilus":
+	case cmd == "dolphin" || cmd == "nautilus":
 		return "files"
 	case cmd == "chromium":
 		return "browser"

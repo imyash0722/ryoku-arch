@@ -9,7 +9,7 @@ time (`RYOKU_REPO/system/packages/`).
 - `base.packages` The set every machine gets, installed by `pacstrap`. Core
   system, the boot chain, networking, audio, plain Hyprland, the SDDM greeter and
   qylock dependencies, laptop idle/battery support (`hypridle`, `upower`), OpenRGB
-  for wallpaper-driven keyboard/LED color, the terminal apps (kitty, nautilus,
+  for wallpaper-driven keyboard/LED color, the core apps (kitty, dolphin,
   chromium, mpv), the shell stack (fish, starship, fastfetch and friends), and
   fonts: Inter for Ryoku UI text, Noto Emoji, and Noto CJK so Japanese labels and
   the 力 mark render in browsers and Qt.

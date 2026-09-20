@@ -73,7 +73,7 @@ The frame-surface tools use `grim`/`slurp`, `hyprpicker`, `curl`/`jq`, `mpv`,
 The ``Super+` `` voice dictation drives `voxtype` (optional, from `voxtype-bin`)
 for the transcription and `wtype` to type it into the focused app; pick the
 engine and model in Ryoku Settings' Dictation page.
-The keybinds open `kitty` (terminal) and `nautilus` (files). Fonts: JetBrains
+The keybinds open `kitty` (terminal) and `dolphin` (files). Fonts: JetBrains
 Mono Nerd and Noto; cursor: Bibata. The lock is qylock, from `ryoku/`.
 
 ## Develop it live

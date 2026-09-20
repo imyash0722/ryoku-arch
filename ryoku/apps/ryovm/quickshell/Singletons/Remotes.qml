@@ -180,9 +180,8 @@ Singleton {
             "exec \"${TERMINAL:-kitty}\" --class ryoport-ssh -e sh -c 'ssh -t \"$1\" \"$2\"; printf \"\\n── press enter to close ──\\n\"; read _' _ \"$1\" \"$2\"", "--", alias, cmd]);
         logEvent("run", alias, I18n.tr("%1 on %2").arg(cmd.split(" ")[0]).arg(alias));
     }
-    // browse and transfer files over SFTP in the file manager. nautilus (the
-    // shipped GUI file manager) auto-mounts the gvfs sftp location and opens it;
-    // `gio open` needs it mounted first and the xdg sftp handler is unset here.
+    // browse and transfer files over SFTP in Dolphin. Dolphin supports native
+    // KIO sftp URLs (sftp://user@host:port/).
     function openFiles(host) {
         if (!host) return;
         var u = host.user && host.user.length > 0 ? host.user + "@" : "";

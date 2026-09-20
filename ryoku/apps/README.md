@@ -22,9 +22,8 @@ maps to a place under `~/.config` (except the small helper script noted below).
 - `yazi/` The terminal file manager (`yazi.toml`).
 - `npm/` (`npmrc`) and `pip/` (`pip.conf`) keep each package manager writing under
   the home, so neither needs root.
-- `nautilus/` The graphical file manager. Ships one `nautilus-python` extension,
-  the Ryoku stash actions on the right-click menu (install, compress, LocalSend);
-  see its README. No dconf settings to ship.
+- `dolphin/` The graphical file manager. Ships KDE service menus for
+  Ryoku stash actions on the right-click menu (install, compress); see its README.
 - `mimeapps.list` The default-application map (text files route to neovim).
 
 ## GUI apps

@@ -171,9 +171,8 @@ kitty
 mpv
 mpv-mpris
 dolphin
-nautilus
-# nautilus-python: runs the Ryoku stash actions in the file-manager right-click menu
-nautilus-python
+dolphin-plugins
+kio-admin
 kimageformats
 
 

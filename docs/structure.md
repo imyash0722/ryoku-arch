@@ -16,7 +16,7 @@ truth for the live desktop.
 
 - `apps/` one directory per application, holding that app's native config only:
   `kitty/`, `fish/`, `fastfetch/` (plus the `ryoku-fastfetch` launcher), `nvim/`
-  (LazyVim), `yazi/`, `starship/`, `nautilus/`, `npm/` (`npmrc`), `pip/`
+  (LazyVim), `yazi/`, `starship/`, `dolphin/`, `npm/` (`npmrc`), `pip/`
   (`pip.conf`), `hyprland-preview-share-picker/` (the screen-share source
   chooser xdph launches). `mimeapps.list` sets the default apps and ships to
   `/usr/share/applications/mimeapps.list`, the lowest XDG layer, so a user's own

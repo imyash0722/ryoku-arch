@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=video/mp4;video/x-matroska;video/quicktime;video/webm;video/x-msvideo;video/x-m4v;image/jpeg;image/png;image/webp;image/bmp;
+Actions=CompressWithRyoku;
+
+[Desktop Action CompressWithRyoku]
+Name=Compress with Ryoku
+Icon=application-x-archive
+Exec=sh -c 'for f in "$@"; do "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/stash-compress.sh" "$f"; done' dummy %F

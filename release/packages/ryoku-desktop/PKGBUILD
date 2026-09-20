@@ -238,8 +238,8 @@ optdepends=(
   'fastfetch: system summary (launcher, RyoStore covers)'
   'yazi: terminal file manager'
   'neovim: the shipped editor'
-  'nautilus: alternative graphical file manager'
-  'nautilus-python: Ryoku stash actions in the Nautilus right-click menu'
+  'dolphin-plugins: extra plugins for Dolphin file manager'
+  'kio-admin: manage files as administrator in Dolphin'
   'ryotunes: the Ryoku music app the now-playing widget follows'
 
   'ryomotion: screen-demo recorder and editor'
@@ -566,12 +566,12 @@ EOF
   # user's API key and machine-translates the UI to their language.
   install -Dm755 "$_repo/ryoku/i18n/tools/sync.py" "$pkgdir/usr/bin/ryoku-i18n"
 
-  # Nautilus stash actions: a nautilus-python extension that adds the deck's
-  # install/compress/LocalSend actions to the file-manager right-click menu.
-  # Loaded for every user from the system extensions dir, so it needs no
-  # per-user materialize.
-  install -Dm644 "$_repo/ryoku/apps/nautilus/ryoku-stash-menu.py" \
-    "$pkgdir/usr/share/nautilus-python/extensions/ryoku-stash-menu.py"
+  # Dolphin stash actions: KDE service menus that add the deck's
+  # install/compress actions to Dolphin's right-click menu.
+  install -Dm644 "$_repo/ryoku/apps/dolphin/ryoku-stash-install.desktop" \
+    "$pkgdir/usr/share/kio/servicemenus/ryoku-stash-install.desktop"
+  install -Dm644 "$_repo/ryoku/apps/dolphin/ryoku-stash-compress.desktop" \
+    "$pkgdir/usr/share/kio/servicemenus/ryoku-stash-compress.desktop"
 
   # GPU primary-renderer udev rule: boot-stable /dev/dri/ryoku-gpu-* symlinks
   # that ryoku-gpu pins via AQ_DRM_DEVICES. vendor location = active on boot,

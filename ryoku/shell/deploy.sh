@@ -545,11 +545,13 @@ else
   say "skipping packaged externals (sudo or pacman not available)"
 fi
 
-# Nautilus stash actions (a nautilus-python extension). Installs ship it system-wide
-# from the ryoku-desktop package; the dev loop drops it in the user extensions dir.
-install -Dm644 "$here/../apps/nautilus/ryoku-stash-menu.py" \
-  "$appshare/nautilus-python/extensions/ryoku-stash-menu.py"
-say "installed nautilus stash menu -> $appshare/nautilus-python/extensions"
+# Dolphin stash actions (KDE service menus). Installs ship it system-wide
+# from the ryoku-desktop package; the dev loop drops it in the user service menus dir.
+install -Dm644 "$here/../apps/dolphin/ryoku-stash-install.desktop" \
+  "$appshare/kio/servicemenus/ryoku-stash-install.desktop"
+install -Dm644 "$here/../apps/dolphin/ryoku-stash-compress.desktop" \
+  "$appshare/kio/servicemenus/ryoku-stash-compress.desktop"
+say "installed dolphin stash menus -> $appshare/kio/servicemenus"
 
 # Pause Hyprland's config auto-reload so the hypr swap below never exposes a
 # missing hyprland.lua (which would trip emergency mode).

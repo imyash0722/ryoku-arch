@@ -46,8 +46,8 @@ var appRoleDefs = []struct {
 		{"Neovim", "kitty -e nvim"}, {"Helix", "kitty -e hx"}, {"Vim", "kitty -e vim"},
 		{"VS Code", "code"}, {"VSCodium", "codium"}, {"Zed", "zed"}, {"Sublime Text", "subl"},
 	}},
-	{"files", "File manager", "nautilus", [][2]string{
-		{"Files (Nautilus)", "nautilus"}, {"Thunar", "thunar"}, {"Dolphin", "dolphin"},
+	{"files", "File manager", "dolphin", [][2]string{
+		{"Dolphin", "dolphin"}, {"Thunar", "thunar"},
 		{"Nemo", "nemo"}, {"PCManFM", "pcmanfm-qt"}, {"Yazi", "kitty -e yazi"},
 	}},
 	{"notes", "Notes", "", [][2]string{

@@ -36,7 +36,7 @@ desktop. See `docs/structure.md` for the repo-wide map.
   setup).
 - `apps/` One directory per application, holding that app's native config only:
   kitty, fish, fastfetch (plus the `ryoku-fastfetch` launcher), nvim (LazyVim),
-  yazi, starship, nautilus, npm (`npmrc`), pip (`pip.conf`). `mimeapps.list` sets
+  yazi, starship, dolphin, npm (`npmrc`), pip (`pip.conf`). `mimeapps.list` sets
   the default apps.
 - `assets/` `brand/` the 力 logo and icons, and `wallpapers/` the shipped wallpaper
   set (installs to `~/Pictures/Wallpapers`).
