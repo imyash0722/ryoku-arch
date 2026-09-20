@@ -81,6 +81,12 @@ hl.config({
       new_optimizations = true,
     },
   },
+  dwindle = {
+    special_scale_factor = 0.9,
+  },
+  master = {
+    special_scale_factor = 0.9,
+  },
 })
 
 -- the launcher is a translucent layer-shell overlay; blur its backdrop so the
