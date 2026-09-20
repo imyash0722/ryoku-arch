@@ -55,6 +55,9 @@ hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 -- takes a direct Wayland path instead:
 hl.env("GSK_RENDERER", "gl")
 
+-- Route GTK file choosers through xdg-desktop-portal so the KDE/Dolphin picker opens
+hl.env("GTK_USE_PORTAL", "1")
+
 -- qt6ct, not kde: the kde platform theme reads ~/.config/kdeglobals (which the
 -- daemon keeps in sync) but needs plasma-integration, which Ryoku does not ship,
 -- so switching here would strip plain Qt apps of their palette, Papirus icons

@@ -240,6 +240,7 @@ optdepends=(
   'neovim: the shipped editor'
   'dolphin-plugins: extra plugins for Dolphin file manager'
   'kio-admin: manage files as administrator in Dolphin'
+  'xdg-desktop-portal-kde: KDE Dolphin file picker dialog portal for browsers and apps'
   'ryotunes: the Ryoku music app the now-playing widget follows'
 
   'ryomotion: screen-demo recorder and editor'

@@ -46,6 +46,14 @@ hl.window_rule({
     float = true,
 })
 
+hl.window_rule({
+    name   = "float-portal-file-picker",
+    match  = { class = "org.freedesktop.impl.portal.desktop.kde" },
+    float  = true,
+    size   = fit(1050, 700),
+    center = true,
+})
+
 -- Firefox Picture-in-Picture: float, pin across workspaces, small bottom-right placement
 hl.window_rule({
     name  = "firefox-pip",
