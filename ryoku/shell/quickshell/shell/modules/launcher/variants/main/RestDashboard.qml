@@ -67,37 +67,32 @@ Item {
         precision: SystemClock.Minutes
     }
 
-    MainVariant.Squircle {
+    ClippingRectangle {
         anchors.fill: parent
-        radius: root.cardRadius
-        power: 4
+        radius: root.cardRadius * root.s
         color: Theme.drawer
-        borderColor: Theme.border
-        borderWidth: 1
+        border.color: Theme.border
+        border.width: 1
+        contentUnderBorder: true
 
         // Backmost layer: the launcher's hero art, dimmed so it reads as
         // atmosphere. Image, strength, and focal spot come from the Hub's App
         // Launcher page (launcher.json); empty falls back to the shipped
         // hands-of-creation art. Sized to cover the card, shifted to the saved spot.
-        ClippingRectangle {
-            anchors.fill: parent
-            radius: root.cardRadius * root.s
-            color: "transparent"
-            Image {
-                id: hero
-                readonly property real ir: hero.implicitHeight > 0 ? hero.implicitWidth / hero.implicitHeight : 1
-                readonly property real fr: parent.height > 0 ? parent.width / parent.height : 1
-                width: hero.ir > hero.fr ? parent.height * hero.ir : parent.width
-                height: hero.ir > hero.fr ? parent.height : parent.width / hero.ir
-                x: (parent.width - width) * LauncherConfig.heroPosX
-                y: (parent.height - height) * LauncherConfig.heroPosY
-                source: LauncherConfig.heroImage !== ""
-                    ? LauncherConfig.heroImage
-                    : Qt.resolvedUrl("../../shared/art/hands-adam.png")
-                opacity: LauncherConfig.heroStrength
-                asynchronous: true
-                smooth: true
-            }
+        Image {
+            id: hero
+            readonly property real ir: hero.implicitHeight > 0 ? hero.implicitWidth / hero.implicitHeight : 1
+            readonly property real fr: parent.height > 0 ? parent.width / parent.height : 1
+            width: hero.ir > hero.fr ? parent.height * hero.ir : parent.width
+            height: hero.ir > hero.fr ? parent.height : parent.width / hero.ir
+            x: (parent.width - width) * LauncherConfig.heroPosX
+            y: (parent.height - height) * LauncherConfig.heroPosY
+            source: LauncherConfig.heroImage !== ""
+                ? LauncherConfig.heroImage
+                : Qt.resolvedUrl("../../shared/art/hands-adam.png")
+            opacity: LauncherConfig.heroStrength
+            asynchronous: true
+            smooth: true
         }
 
         // Lit top edge: a hairline of palette sheen inset past the rounded
@@ -116,15 +111,13 @@ Item {
 
         // The solar wave: a filled horizon spanning the card, clipped to the
         // rounded corners so it never spills. Painted behind the text.
-        ClippingRectangle {
+        Item {
             id: waveClip
             visible: LauncherConfig.horizonMode !== "off"
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             height: 42 * root.s
-            radius: root.cardRadius * root.s
-            color: "transparent"
 
             Canvas {
                 id: wave
