@@ -165,10 +165,11 @@ func rashinSkillSource() string {
 	var roots []string
 	if v := strings.TrimSpace(os.Getenv("RYOKU_RASHIN_SKILLS")); v != "" {
 		roots = append(roots, v)
-	}
-	roots = append(roots, "/usr/share/ryoku/skills")
-	if repo := sys.ResolveRepo(); repo != "" {
-		roots = append(roots, filepath.Join(repo, "ryoku", "rashin", "skills"))
+	} else {
+		roots = append(roots, "/usr/share/ryoku/skills")
+		if repo := sys.ResolveRepo(); repo != "" {
+			roots = append(roots, filepath.Join(repo, "ryoku", "rashin", "skills"))
+		}
 	}
 	for _, r := range roots {
 		if sys.Exists(filepath.Join(r, "ryoku", "SKILL.md")) {

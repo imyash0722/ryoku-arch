@@ -37,8 +37,9 @@ ryoku_bootloader() {
     ryoku_bootloader_own_esp
   fi
 
-  log "enabling services: sddm, NetworkManager, bluetooth, rtkit, tlp"
+  log "enabling services: sddm, NetworkManager, bluetooth, rtkit, tlp, kdeconnectd"
   run arch-chroot /mnt systemctl enable sddm.service NetworkManager.service bluetooth.service rtkit-daemon.service tlp.service
+  run arch-chroot /mnt systemctl --global enable kdeconnectd.service kde-integrationd.service 2>/dev/null || true
   run arch-chroot /mnt systemctl mask power-profiles-daemon.service 2>/dev/null || true
 }
 

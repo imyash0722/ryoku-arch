@@ -44,6 +44,8 @@ func shippedApps() []shippedApp {
 		{"yazi", "terminal file manager"},
 		{"neovim", "the shipped editor"},
 		{"dolphin", "the graphical file manager"},
+		{"kdeconnect", "seamless device integration across Linux and Android"},
+		{"sshfs", "remote file browsing over KDE Connect"},
 		{"ryomotion", "the screen-demo recorder and editor"},
 		{"waifu2x-ncnn-vulkan", "AI upscale behind ryoshot Beautify HD and ryowalls Enhance"},
 		{"pavucontrol", "the GUI mixer the bar's Open audio button launches"},

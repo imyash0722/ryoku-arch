@@ -300,6 +300,7 @@ ryoku_deploy_seed() {
   deploy_file "$RYOKU_REPO/ryoku/apps/npm/npmrc" "$h/.npmrc"
   deploy_file "$RYOKU_REPO/ryoku/apps/zsh/zshrc" "$h/.zshrc"
   deploy_dir "$RYOKU_REPO/ryoku/apps/zsh" "$h/.config/zsh"
+  deploy_file "$RYOKU_REPO/ryoku/apps/mimeapps.list" /mnt/usr/share/applications/mimeapps.list
 }
 
 

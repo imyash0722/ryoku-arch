@@ -127,6 +127,18 @@ _bt_reset_unit() {
   mkdir -p /var/lib/ryoku && : >"$marker"
 }
 
+# enable KDE Connect and kde-integrationd service once via --global, so every user
+# picks it up on login. Marker keeps it one-shot: a user who later disables it
+# stays disabled across upgrades.
+_kdeconnect() {
+  [ -e /usr/lib/systemd/user/kdeconnectd.service ] || return 0
+  local marker=/var/lib/ryoku/kdeconnect-enabled
+  [ -e "$marker" ] && return 0
+  systemctl --global enable kdeconnectd.service 2>/dev/null || true
+  systemctl --global enable kde-integrationd.service 2>/dev/null || true
+  mkdir -p /var/lib/ryoku && : >"$marker"
+}
+
 # The kill switch owns its boot dependency: only an explicitly armed switch
 # leaves the units enabled. An unarmed upgrade removes legacy dependencies.
 _network_kill_units() {
@@ -153,6 +165,7 @@ post_install() {
   _logind_lid
   _ai_usage_timer
   _bt_reset_unit
+  _kdeconnect
   _boot_theme
   _hint
 }
@@ -168,6 +181,7 @@ post_upgrade() {
   _logind_lid
   _ai_usage_timer
   _bt_reset_unit
+  _kdeconnect
   _boot_theme
   _network_kill_units
   _hint

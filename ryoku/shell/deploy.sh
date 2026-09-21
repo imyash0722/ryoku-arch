@@ -664,6 +664,8 @@ systemctl --user try-restart ryogami.service 2>/dev/null || true
 sed -i "s|^ExecStart=-/usr/bin/|ExecStart=-$bindir/|" "$cfg/systemd/user/ryoku-ai-usage.service"
 systemctl --user daemon-reload 2>/dev/null || true
 systemctl --user enable --now ryoku-ai-usage.timer 2>/dev/null || true
+systemctl --user enable kdeconnectd.service 2>/dev/null || true
+systemctl --user enable kde-integrationd.service 2>/dev/null || true
 # pip (PEP 668 --user): Ryoku-owned, so a dev box tracks it the way the package
 # materializes it for an installed one.
 mkdir -p "$cfg/pip"; cp -a "$here/../apps/pip/pip.conf" "$cfg/pip/pip.conf"

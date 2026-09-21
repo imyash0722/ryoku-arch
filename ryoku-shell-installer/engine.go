@@ -1217,8 +1217,11 @@ EOF`); err != nil {
 	}{
 		{"ryoku/assets/brand", ".local/share/ryoku/assets/brand", true, false},
 		{"ryoku/assets/wallpapers", "Pictures/Wallpapers", true, true},
+		{"ryoku/assets/ryodecors", "Pictures/ryodecors", true, true},
 		{"ryoku/assets/desktop_presets", ".config/ryoku/user_edits/desktop_presets", true, true},
 		{"ryoku/apps/npm/npmrc", ".npmrc", false, true},
+		{"ryoku/apps/zsh/zshrc", ".zshrc", false, true},
+		{"ryoku/apps/zsh", ".config/zsh", true, true},
 		{"ryoku/apps/nvim/ryoku-nvim.desktop", ".local/share/applications/ryoku-nvim.desktop", false, false},
 		// no mimeapps.list seed: the default-app map belongs to the vendor layer
 		// (/usr/share/applications/mimeapps.list, laid by ryoku-desktop or by
@@ -1237,7 +1240,19 @@ EOF`); err != nil {
 		}
 		e.say(i18n.Tf("seeded ~/%s", s.dst))
 	}
-	return e.cmd("", nil, "systemctl", "--user", "daemon-reload")
+	if err := e.sudo("install", "-Dm644", filepath.Join(e.payload, "ryoku/apps/mimeapps.list"), "/usr/share/applications/mimeapps.list"); err != nil {
+		e.say(i18n.T("warning: could not update /usr/share/applications/mimeapps.list (continuing)"))
+	}
+	if err := e.cmd("", nil, "systemctl", "--user", "daemon-reload"); err != nil {
+		e.say(i18n.T("warning: could not reload user systemd daemon (continuing)"))
+	}
+	if err := e.cmd("", nil, "systemctl", "--user", "enable", "kdeconnectd.service"); err != nil {
+		e.say(i18n.T("warning: could not enable kdeconnectd.service (continuing)"))
+	}
+	if err := e.cmd("", nil, "systemctl", "--user", "enable", "kde-integrationd.service"); err != nil {
+		e.say(i18n.T("warning: could not enable kde-integrationd.service (continuing)"))
+	}
+	return nil
 }
 
 func stepAUR(e *engine) error {
