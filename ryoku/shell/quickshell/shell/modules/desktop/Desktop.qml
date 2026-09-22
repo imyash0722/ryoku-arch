@@ -779,8 +779,8 @@ Scope {
                 url: StageCfg.StageBackend.layerUrlFor(root.wallpaperPath, index)
                 fit: root.wallpaperFit
                 z: StageCfg.StageBackend.layerFront(root.wallpaperPath, index) ? 4 : 2
-                mouseNX: StageCfg.StageBackend.cursorNXFor(root.screen.name)
-                mouseNY: StageCfg.StageBackend.cursorNYFor(root.screen.name)
+                mouseNX: StageCfg.StageBackend.cursorNXFor(root.screen ? root.screen.name : "")
+                mouseNY: StageCfg.StageBackend.cursorNYFor(root.screen ? root.screen.name : "")
                 energy: VizCfg.Spectrum.energy
                 motionEnabled: root.stageParallax
             }
