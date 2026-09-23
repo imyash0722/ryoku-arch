@@ -35,7 +35,7 @@ Item {
     property bool fpEnabled: true            // from ~/.config/qylock/fingerprint
     property bool fpHasFingers: false        // fprintd-list reports >= 1 finger
     readonly property bool fingerprintReady: fpEnabled && fpHasFingers
-    property string fingerprintState: "idle" // idle | scanning | success | fail
+    property string fingerprintState: "idle" // idle | ready | scanning | success | fail
     property bool fingerprintUnlock: false   // true if sensor won (not typed)
     property bool armWhenReady: false        // lock surface is secured, arm now
     property bool armPending: false          // an armPrep run is in flight
@@ -365,11 +365,17 @@ Item {
             }
         }
 
+        onPamMessage: {
+            if (shim.fingerprintState === "ready" && pam.message !== "") {
+                shim.fingerprintState = "scanning";
+            }
+        }
+
         // PAM conversation completed. Success = unlock; failure = re-arm.
         onCompleted: (result) => {
             if (result === PamResult.Success) {
                 // A scan that ended without a typed key means the sensor won.
-                shim.fingerprintUnlock = (shim.fingerprintState === "scanning" && !shim.fpTyped);
+                shim.fingerprintUnlock = ((shim.fingerprintState === "ready" || shim.fingerprintState === "scanning") && !shim.fpTyped);
                 shim.fingerprintState = "success";
                 shim.sddm.loginSucceeded();
                 Quickshell.execDetached(["loginctl", "unlock-session"]);
@@ -425,7 +431,7 @@ Item {
         pam.pendingPassword = "";
         shim.fpTyped = false;
         shim.fingerprintUnlock = false;
-        shim.fingerprintState = "scanning";
+        shim.fingerprintState = "ready";
         // start() returns false when the config dir/file or user cannot be
         // resolved; surface that instead of failing silently.
         var started = pam.start();

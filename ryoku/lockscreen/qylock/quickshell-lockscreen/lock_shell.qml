@@ -146,7 +146,8 @@ ShellRoot {
                 opacity: (ov.ph === "scanning" || ov.ph === "success" || ov.ph === "fail") ? 0.92 : 0
                 Behavior on opacity { NumberAnimation { duration: 180 } }
                 text: ov.ph === "success" ? I18n.tr("Unlocked")
-                    : (ov.ph === "fail" ? I18n.tr("Not recognized") : I18n.tr("Reading\u2026"))
+                    : (ov.ph === "fail" ? I18n.tr("Not recognized")
+                    : (ov.ph === "scanning" ? I18n.tr("Reading\u2026") : ""))
                 visible: opacity > 0.01
             }
         }
